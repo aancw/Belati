@@ -8,15 +8,18 @@ Just for learning stuff and OSINT purpose. Correct me if i'm wrong
 - Whois(Indonesian TLD Support)
 - Banner Grabbing
 - Subdomain Enumeration
+- Service Scanning for all Subdomain Machine
+- Web Appalyzer Support
 - DNS mapping / Zone Scanning
 - Mail Harvester from Website & Search Engine
 - Scrapping Public Document for Domain from Search Engine
 
 ## TODO
 - Automatic OSINT with Username and Email support
+- Organization or Company OSINT Support
 - Collecting Data from Public service with Username and Email for LinkedIn and other service.
 - Setup Wizard for Token and setting up Belati
-- Token Support 
+- Token Support
 - Email Harvesting with multiple content(github, linkedin, etc)
 - Scrapping Public Document with multiple search engine(yahoo, yandex, bing etc)
 - Metadata Extractor
@@ -29,10 +32,15 @@ Just for learning stuff and OSINT purpose. Correct me if i'm wrong
 ```
 git clone https://github.com/aancw/Belati.git
 pip2 install -r requirements.txt
+sudo su
 python Belati.py --help
 ```
 
 Still on progress. Be patient.
+
+## Why Need Root Privilege?
+
+I've try to avoid using Root Privilege, but nmap need Root Privilege. You can add sudo or other way to run nmap without root privilege. It's your choice ;)
 
 ## Dependencies
 - urllib2
@@ -52,6 +60,7 @@ Still on progress. Be patient.
 - python-whois
 - Sublist3r
 - Subbrute
+- nmap
 
 ## Notice
 I'm using PyWhois Library, Sublist3r, MailHarvester, Emingoo as part of my code. This tool is for educational purposes only. Any damage you make will not affect the author. Do It With Your Own Risk
