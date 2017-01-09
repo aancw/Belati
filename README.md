@@ -42,6 +42,10 @@ Still on progress. Be patient.
 
 I've try to avoid using Root Privilege, but nmap need Root Privilege. You can add sudo or other way to run nmap without root privilege. It's your choice ;)
 
+Reference -> https://secwiki.org/w/Running_nmap_as_an_unprivileged_user
+
+Don't worry. Belati still running when you are run with normal user ;)
+
 ## Dependencies
 - urllib2
 - dnspython
@@ -55,6 +59,7 @@ I've try to avoid using Root Privilege, but nmap need Root Privilege. You can ad
 - colorama
 - validators
 - tqdm
+- python-nmap
 
 ## Library
 - python-whois
