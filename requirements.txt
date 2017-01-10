@@ -1,0 +1,12 @@
+urllib2
+dnspython
+requests
+argparse
+texttable
+python-geoip-geolite2
+python-geoip
+dnsknife
+termcolor
+colorama
+validators
+tqdm

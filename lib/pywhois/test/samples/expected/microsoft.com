@@ -1,0 +1,1 @@
+{"domain_name": "MICROSOFT.COM", "expiration_date": "2014-05-03 00:00:00", "updated_date": "2006-10-10 00:00:00", "status": ["clientDeleteProhibited", "clientTransferProhibited", "clientUpdateProhibited"], "creation_date": "1991-05-02 00:00:00"}
