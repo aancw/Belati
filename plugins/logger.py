@@ -29,8 +29,17 @@ class logger(object):
     def __init__(self):
         timestamp = int(time.time())
         datetime = time.strftime("%d%m%Y")
-        log_filename = "Belati-" + datetime + "-" + str(timestamp) + ".log"
-        logging.basicConfig(filename="logs/" + log_filename, format='%(message)s')
+        log_dir = "logs/"
+        log_filename = log_dir + "Belati-" + datetime + "-" + str(timestamp) + ".log"
+
+        if not os.path.exists(os.path.dirname(log_filename)):
+            try:
+                os.makedirs(os.path.dirname(log_filename))
+            except OSError as exc: # Guard against race condition
+                if exc.errno != errno.EEXIST:
+                    raise
+
+        logging.basicConfig(filename=log_filename, format='%(message)s')
 
     def consoleLog(self, log_word, newline=1):
         logging.warning(log_word)
