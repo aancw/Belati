@@ -23,7 +23,7 @@ import argparse
 import urllib2
 import sys, signal, socket
 from plugins.checkDomain import checkDomain
-from plugins.bannerGrab import bannerGrab
+from plugins.banner_grab import BannerGrab
 from plugins.logger import logger
 from plugins.harvestEmail import harvestEmail
 from plugins.harvestPublicDocument import harvestPublicDocument
@@ -113,9 +113,9 @@ class Belati(object):
         check.whoisDomain(domainName)
 
     def bannerGrab(self, domainName):
-        banner = bannerGrab()
+        banner = BannerGrab()
         log.consoleLog(G + "[*] Perfoming HTTP Banner Grabbing..." + W)
-        banner.showBanner(domainName)
+        banner.show_banner(domainName)
 
     def enumerateSubdomains(self, domainName):
         log.consoleLog(G + "[*] Perfoming Subdomains Enumeration..." + W)

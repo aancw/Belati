@@ -27,12 +27,12 @@ import sys
 
 log = logger()
 
-class bannerGrab(object):
-    def showBanner(self, domainName):
+class BannerGrab(object):
+    def show_banner(self, domainName):
         req = urllib2.Request(domainName, headers={'User-Agent' : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"})
         header = urllib2.urlopen(req).info()
         log.consoleLog(header)
 
 if __name__ == '__main__':
-    bannerGrabApp = bannerGrab()
-    bannerGrabApp
+    BannerGrabApp = BannerGrab()
+    BannerGrabApp
