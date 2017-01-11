@@ -27,8 +27,8 @@ import urllib2
 # This is part of MailHarvester and EMINGOO regex
 # Thanks to pantuts and maldevel
 
-class harvestEmail(object):
-    def crawlSearch(self, domain):
+class HarvestEmail(object):
+    def crawl_search(self, domain):
         try:
             url = 'https://www.google.com/search?num=200&start=0&filter=0&hl=en&q=@' + domain
             req = urllib2.Request(url, headers={'User-Agent' : "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:19.0) Gecko/20100101 Firefox/49.0"})
@@ -43,5 +43,5 @@ class harvestEmail(object):
             print(e)
 
 if __name__ == '__main__':
-    harvestEmailApp = harvestEmail()
-    harvestEmailApp
+    HarvestEmailApp = HarvestEmail()
+    HarvestEmailApp

@@ -22,20 +22,20 @@
 # This file is part of Belati project
 
 from Wappalyzer import Wappalyzer, WebPage
-from logger import logger
+from logger import Logger
 
-log = logger()
+log = Logger()
 
-class wappalyzer(object):
+class Wappalyzer(object):
     def run_wappalyze(self, domain):
         analyzer = Wappalyzer.latest()
         webpage = WebPage.new_from_url(domain)
         analyze_result = analyzer.analyze(webpage)
         if analyze_result:
             for result in analyze_result:
-                log.consoleLog(result)
+                log.console_log(result)
         else:
-            log.consoleLog("Result Not Found")
+            log.console_log("Result Not Found")
 
 if __name__ == '__main__':
     wappalyzerApp = wappalyzer()

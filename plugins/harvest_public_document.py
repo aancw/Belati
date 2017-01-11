@@ -23,7 +23,7 @@
 
 import re, os
 import urllib2, urllib
-from logger import logger
+from logger import Logger
 from tqdm import tqdm
 import requests
 
@@ -34,51 +34,52 @@ B = '\033[94m'  # blue
 R = '\033[91m'  # red
 W = '\033[0m'   # white
 
-log = logger()
+log = Logger()
 
-class harvestPublicDocument(object):
+class HarvestPublicDocument(object):
     def init_crawl(self, domain):
-        log.consoleLog(G + "[*] Gather Link from Google Search for domain " + domain + W)
-        self.harvestPublicDoc(domain, "pdf")
-        self.harvestPublicDoc(domain, "doc")
-        self.harvestPublicDoc(domain, "xls")
-        self.harvestPublicDoc(domain, "odt")
-        self.harvestPublicDoc(domain, "ppt")
-        self.harvestPublicDoc(domain, "rtf")
-        self.harvestPublicDoc(domain, "txt")
+        log.console_log(G + "[*] Gather Link from Google Search for domain " + domain + W)
+        self.harvest_public_doc(domain, "pdf")
+        self.harvest_public_doc(domain, "doc")
+        self.harvest_public_doc(domain, "xls")
+        self.harvest_public_doc(domain, "odt")
+        self.harvest_public_doc(domain, "ppt")
+        self.harvest_public_doc(domain, "rtf")
+        self.harvest_public_doc(domain, "txt")
         #https://www.google.com/search?q=site:domain.com%20ext:pdf&filter=0&num=100#q=site:domain.com+ext:txt&start=100&filter=0
 
-    def harvestPublicDoc(self, domain, extension):
-        log.consoleLog(G + "[*] Searching " + extension.upper() + " Document..." + W)
-        totalFiles = 0
+    def harvest_public_doc(self, domain, extension):
+        log.console_log(G + "[*] Searching " + extension.upper() + " Document..." + W)
+        total_files = 0
         try:
             url = 'https://www.google.com/search?q=site:' + domain + '%20ext:' + extension + '&filter=0&num=200'
             req = urllib2.Request(url, headers={'User-Agent' : "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:19.0) Gecko/20100101 Firefox/49.0"})
             data = urllib2.urlopen(req).read()
             regex = "(?P<url>https?://[^:]+\.%s)" % extension
             data = re.findall(regex, data)
-            listFilesDownload = list(set(data))
-            totalFiles = str(len(listFilesDownload))
-            log.consoleLog(Y + "[*] Found " + totalFiles + " " + extension.upper() + " files!" + W )
-            if totalFiles is not 0:
-                log.consoleLog(G + "[*] Please wait, lemme download it for you ;) " + W)
-                for filesDownload in listFilesDownload:
-                    self.downloadFiles(filesDownload)
+            list_files_download = list(set(data))
+            total_files = str(len(list_files_download))
+            log.console_log(Y + "[*] Found " + total_files + " " + extension.upper() + " files!" + W )
+            if total_files is not 0:
+                log.console_log(G + "[*] Please wait, lemme download it for you ;) " + W)
+                for files_download in list_files_download:
+                    log.no_console_log(files_download.split('/')[-1])
+                    self.download_files(files_download)
         except urllib2.URLError, e:
-            log.consoleLog(e)
+            log.console_log(e)
 
-    def downloadFiles(self, url):
+    def download_files(self, url):
         filename = url.split('/')[-1]
-        fullFilename = 'belatiFiles/%s' % filename
-        if not os.path.exists(os.path.dirname(fullFilename)):
+        full_filename = 'belatiFiles/%s' % filename
+        if not os.path.exists(os.path.dirname(full_filename)):
             try:
-                os.makedirs(os.path.dirname(fullFilename))
+                os.makedirs(os.path.dirname(full_filename))
             except OSError as exc: # Guard against race condition
                 if exc.errno != errno.EEXIST:
                     raise
 
         with tqdm(unit='B', unit_scale=True, miniters=1,desc=filename) as t:
-            urllib.urlretrieve(url, filename=fullFilename,reporthook=self.my_hook(t), data=None)
+            urllib.urlretrieve(url, filename=full_filename,reporthook=self.my_hook(t), data=None)
 
     def my_hook(self,t):
       """
@@ -111,5 +112,5 @@ class harvestPublicDocument(object):
       return inner
 
 if __name__ == '__main__':
-    harvestPublicDocumentApp = harvestPublicDocument()
-    harvestPublicDocument
+    HarvestPublicDocumentApp = HarvestPublicDocument()
+    HarvestPublicDocumentApp

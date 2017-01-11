@@ -25,7 +25,7 @@ import sys, os
 import logging
 import time
 
-class logger(object):
+class Logger(object):
     def __init__(self):
         timestamp = int(time.time())
         datetime = time.strftime("%d%m%Y")
@@ -41,12 +41,15 @@ class logger(object):
 
         logging.basicConfig(filename=log_filename, format='%(message)s')
 
-    def consoleLog(self, log_word, newline=1):
+    def console_log(self, log_word, newline=1):
         logging.warning(log_word)
         if newline == 1:
             print(log_word)
         else:
             sys.stdout.write(log_word)
+            
+    def no_console_log(self, log_word, newline=1):
+        logging.warning(log_word)
 
 if __name__ == '__main__':
     LoggerApp = Logger()

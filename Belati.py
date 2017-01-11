@@ -22,13 +22,13 @@
 import argparse
 import urllib2
 import sys, signal, socket
-from plugins.checkDomain import checkDomain
+from plugins.check_domain import CheckDomain
 from plugins.banner_grab import BannerGrab
-from plugins.logger import logger
-from plugins.harvestEmail import harvestEmail
-from plugins.harvestPublicDocument import harvestPublicDocument
-from plugins.scanNmap import scanNmap
-from plugins.wappalyzer import wappalyzer
+from plugins.logger import Logger
+from plugins.harvest_email import HarvestEmail
+from plugins.harvest_public_document import HarvestPublicDocument
+from plugins.scan_nmap import ScanNmap
+from plugins.wappalyzer import Wappalyzer
 from lib.Sublist3r import sublist3r
 from dnsknife.scanner import Scanner
 import dns.resolver
@@ -41,14 +41,14 @@ B = '\033[94m'  # blue
 R = '\033[91m'  # red
 W = '\033[0m'   # white
 
-log = logger()
+log = Logger()
 
 class Belati(object):
     def __init__(self):
         # Passing arguments
         parser = argparse.ArgumentParser(description='=[ Belati v0.1-dev by Petruknisme]')
-        parser.add_argument('-d', action='store', dest='domain' , help='Perform OSINT from Domain')
-        parser.add_argument('-u', action='store', dest='username' , help='Perform OSINT from username')
+        parser.add_argument('-d', action='store', dest='domain' , help='Perform OSINT from Domain e.g petruknisme.com')
+        parser.add_argument('-u', action='store', dest='username' , help='Perform OSINT from username e.g petruknisme')
         parser.add_argument('-e', action='store', dest='email' , help='Perform OSINT from email address')
         parser.add_argument('-c', action='store', dest='orgcomp' , help='Perform OSINT from Organization or Company Name')
         parser.add_argument('-o', action='store', dest='output_files' , help='Save log for output files')
@@ -61,20 +61,20 @@ class Belati(object):
         orgcomp = results.orgcomp
 
         if domain is not None:
-            self.showBanner()
-            self.checkDomain("http://" + domain)
-            self.bannerGrab("http://" + domain)
-            self.enumerateSubdomains(domain)
-            self.scanDNSZone(domain)
-            self.harvestEmailSearch(domain)
-            self.harvestDocument(domain)
+            self.show_banner()
+            #self.check_domain("http://" + domain)
+            #self.banner_grab("http://" + domain)
+            #self.enumerate_subdomains(domain)
+            #self.scan_DNS_zone(domain)
+            #self.harvest_email_search(domain)
+            self.harvest_document(domain)
 
         if username or email or orgcomp is not None:
-            log.consoleLog("This feature will be coming soon. Be patient :)")
+            log.console_log("This feature will be coming soon. Be patient :)")
 
-        log.consoleLog(Y + "All done sir! All log saved in log directory and dowloaded file saved in belatiFiles" + W)
+        log.console_log(Y + "All done sir! All log saved in log directory and dowloaded file saved in belatiFiles" + W)
 
-    def showBanner(self):
+    def show_banner(self):
         banner = """
          ____  _____ _        _  _____ ___
         | __ )| ____| |      / \|_   _|_ _|
@@ -90,7 +90,7 @@ class Belati(object):
 
         """
 
-        warningMessage = """
+        warning_message = """
 
         This tool is for educational purposes only.
         Any damage you make will not affect the author.
@@ -99,32 +99,32 @@ class Belati(object):
         For Better Privacy, Please Use proxychains or other proxy service!
         """
 
-        log.consoleLog(G + banner + W)
-        log.consoleLog(R + warningMessage + W)
+        log.console_log(G + banner + W)
+        log.console_log(R + warning_message + W)
 
-    def checkDomain(self, domainName):
-        check = checkDomain()
+    def check_domain(self, domain_name):
+        check = CheckDomain()
 
-        log.consoleLog(G + "[*] Checking Domain Availability.... " + W, 0)
-        check.domainChecker(domainName)
-        log.consoleLog(G + "[*] Checking URL Alive... " + W, 0)
-        check.aliveCheck(domainName)
-        log.consoleLog(G + "[*] Perfoming Whois... " + W)
-        check.whoisDomain(domainName)
+        log.console_log(G + "[*] Checking Domain Availability.... " + W, 0)
+        check.domain_checker(domain_name)
+        log.console_log(G + "[*] Checking URL Alive... " + W, 0)
+        check.alive_check(domain_name)
+        log.console_log(G + "[*] Perfoming Whois... " + W)
+        check.whois_domain(domain_name)
 
-    def bannerGrab(self, domainName):
+    def banner_grab(self, domain_name):
         banner = BannerGrab()
-        log.consoleLog(G + "[*] Perfoming HTTP Banner Grabbing..." + W)
-        banner.show_banner(domainName)
+        log.console_log(G + "[*] Perfoming HTTP Banner Grabbing..." + W)
+        banner.show_banner(domain_name)
 
-    def enumerateSubdomains(self, domainName):
-        log.consoleLog(G + "[*] Perfoming Subdomains Enumeration..." + W)
-        subdomain_list = sublist3r.main(domainName, 100, "", ports=None, silent=False, verbose=False, enable_bruteforce=False, engines=None)
+    def enumerate_subdomains(self, domain_name):
+        log.console_log(G + "[*] Perfoming Subdomains Enumeration..." + W)
+        subdomain_list = sublist3r.main(domain_name, 100, "", ports=None, silent=False, verbose=False, enable_bruteforce=False, engines=None)
         subdomain_ip_list = []
 
-        log.consoleLog(G + "[*] Perfoming Wapplyzing Web Page..." + W)
+        log.console_log(G + "[*] Perfoming Wapplyzing Web Page..." + W)
         for subdomain in subdomain_list:
-            self.wapplyzingWebPage(subdomain)
+            self.wapplyzing_webpage(subdomain)
             try:
                 subdomain_ip_list.append(socket.gethostbyname(subdomain))
             except socket.gaierror:
@@ -133,58 +133,58 @@ class Belati(object):
         subdomain_ip_listFix = list(set(subdomain_ip_list))
 
         for ipaddress in subdomain_ip_listFix:
-            self.serviceScanning(ipaddress)
+            self.service_scanning(ipaddress)
 
-    def wapplyzingWebPage(self, domain):
-        wappalyzing = wappalyzer()
-        log.consoleLog(G + "[*] Wapplyzing HTTP on domain " + domain + W)
+    def wapplyzing_webpage(self, domain):
+        wappalyzing = Wappalyzer()
+        log.console_log(G + "[*] Wapplyzing HTTP on domain " + domain + W)
         try:
             targeturl = "http://" + domain
             wappalyzing.run_wappalyze(targeturl)
         except:
-            log.consoleLog(R + "[-] HTTP connection was unavailable" + W)
+            log.console_log(R + "[-] HTTP connection was unavailable" + W)
 
-        log.consoleLog(G + "[*] Wapplyzing HTTPS on domain " + domain + W)
+        log.console_log(G + "[*] Wapplyzing HTTPS on domain " + domain + W)
         try:
             targeturl = "https://" + domain
             wappalyzing.run_wappalyze(targeturl)
         except:
-            log.consoleLog(R + "[-] HTTPS connection was unavailable" + W)
+            log.console_log(R + "[-] HTTPS connection was unavailable" + W)
 
-    def serviceScanning(self, ipaddress):
-        scanNm = scanNmap()
-        log.consoleLog(G + "[*] Perfoming Nmap Full Scan on IP " + ipaddress + W)
-        log.consoleLog(G + "[*] nmap -sS -A -Pn " + ipaddress + W)
-        scanNm.runScanning(ipaddress)
+    def service_scanning(self, ipaddress):
+        scan_nm = ScanNmap()
+        log.console_log(G + "[*] Perfoming Nmap Full Scan on IP " + ipaddress + W)
+        log.console_log(G + "[*] nmap -sS -A -Pn " + ipaddress + W)
+        scan_nm.run_scanning(ipaddress)
 
-    def scanDNSZone(self, domainName):
-        log.consoleLog(G + "[*] Perfoming DNS Zone Scanning..." + W)
-        log.consoleLog(G + "[*] Please wait, maximum timeout for checking is 1 minutes")
+    def scan_DNS_zone(self, domain_name):
+        log.console_log(G + "[*] Perfoming DNS Zone Scanning..." + W)
+        log.console_log(G + "[*] Please wait, maximum timeout for checking is 1 minutes")
         signal.signal(signal.SIGALRM, self.timeLimitHandler)
         signal.alarm(60)
         try:
-            scanList = str(list(Scanner(domainName).scan()))
-            log.consoleLog(G + scanList.replace(",","\n") + W)
-            log.consoleLog(G + "DNS Server:" + W)
-            for ns in dns.resolver.query(domainName, 'NS'):
-                log.consoleLog(G + ns.to_text() + W)
-            log.consoleLog(G + "MX Record:" + W)
-            for ns in dns.resolver.query(domainName, 'MX'):
-                log.consoleLog(G + ns.to_text() + W)
+            scan_list = str(list(Scanner(domain_name).scan()))
+            log.console_log(G + scan_list.replace(",","\n") + W)
+            log.console_log(G + "DNS Server:" + W)
+            for ns in dns.resolver.query(domain_name, 'NS'):
+                log.console_log(G + ns.to_text() + W)
+            log.console_log(G + "MX Record:" + W)
+            for ns in dns.resolver.query(domain_name, 'MX'):
+                log.console_log(G + ns.to_text() + W)
         except Exception, exc:
             print(R + "[*] No response from server... SKIP!" + W)
 
-    def harvestEmailSearch(self, domainName):
-        log.consoleLog(G + "[*] Perfoming Email Harvest from Google Search..." + W)
-        harvest = harvestEmail()
-        harvestResult = harvest.crawlSearch(domainName)
-        log.consoleLog(Y + "[*] Found " + str(len(harvestResult)) + " emails on domain " + domainName + W)
-        log.consoleLog(R + '\n'.join(harvestResult) + W)
+    def harvest_email_search(self, domain_name):
+        log.console_log(G + "[*] Perfoming Email Harvest from Google Search..." + W)
+        harvest = HarvestEmail()
+        harvest_result = harvest.crawl_search(domain_name)
+        log.console_log(Y + "[*] Found " + str(len(harvest_result)) + " emails on domain " + domain_name + W)
+        log.console_log(R + '\n'.join(harvest_result) + W)
 
-    def harvestDocument(self, domainName):
-        log.consoleLog(G + "[*] Perfoming Public Document Harvest from Google..." +  W)
-        publicDoc = harvestPublicDocument()
-        publicDoc.init_crawl(domainName)
+    def harvest_document(self, domain_name):
+        log.console_log(G + "[*] Perfoming Public Document Harvest from Google..." +  W)
+        public_doc = HarvestPublicDocument()
+        public_doc.init_crawl(domain_name)
 
     def timeLimitHandler(self, signum, frame):
         print("No Response...")

@@ -21,13 +21,13 @@
 
 # This file is part of Belati project
 
-from logger import logger
+from logger import Logger
 import shlex, subprocess
 
-log = logger()
+log = Logger()
 
-class scanNmap(object):
-    def runScanning(self, ipaddress):
+class ScanNmap(object):
+    def run_scanning(self, ipaddress):
         command = "nmap -sS -A -Pn " + ipaddress
         process = subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE)
         while True:
@@ -35,10 +35,10 @@ class scanNmap(object):
             if output == '' and process.poll() is not None:
                 break
             if output:
-                log.consoleLog(output.strip())
+                log.console_log(output.strip())
         rc = process.poll()
         return rc
 
 if __name__ == '__main__':
-    scanNmapApp = scanNmap()
-    scanNmapApp
+    ScanNmapApp = ScanNmap()
+    ScanNmapApp

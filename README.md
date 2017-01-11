@@ -59,7 +59,6 @@ Don't worry. Belati still running when you are run with normal user ;)
 - colorama
 - validators
 - tqdm
-- python-nmap
 
 ## Library
 - python-whois

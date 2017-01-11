@@ -22,38 +22,38 @@
 # This file is part of Belati project
 
 from lib.pywhois import whois
-from logger import logger
+from logger import Logger
 import urllib2
 import sys
 
-log = logger()
+log = Logger()
 
-class checkDomain(object):
-	def domainChecker(self, domainName):
-		req = urllib2.Request(domainName)
+class CheckDomain(object):
+	def domain_checker(self, domain_name):
+		req = urllib2.Request(domain_name)
 		try:
 			urllib2.urlopen(req)
-			log.consoleLog("OK!")
+			log.console_log("OK!")
 		except urllib2.URLError, e:
 			if str(e.reason) == "[Errno -2] Name or service not known":
-				log.consoleLog("Not EXIST!")
-				log.consoleLog("Check your internet connection or check your target domain")
+				log.console_log("Not EXIST!")
+				log.console_log("Check your internet connection or check your target domain")
 				sys.exit()
 			else:
-				log.consoleLog("OK!")
+				log.console_log("OK!")
 
-	def aliveCheck(self, domainName):
-		request = urllib2.Request(domainName, headers={'User-Agent' : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"})
+	def alive_check(self, domain_name):
+		request = urllib2.Request(domain_name, headers={'User-Agent' : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"})
 		try:
 			urllib2.urlopen(request)
-			log.consoleLog("OK!")
+			log.console_log("OK!")
 		except urllib2.HTTPError, e:
-			log.consoleLog("OK! - (" + str(e.getcode()) + ")")
+			log.console_log("OK! - (" + str(e.getcode()) + ")")
 
-	def whoisDomain(self, domainName):
-		response = whois.whois(domainName)
-		log.consoleLog(response)
+	def whois_domain(self, domain_name):
+		response = whois.whois(domain_name)
+		log.console_log(response)
 
 if __name__ == '__main__':
-    checkDomainApp = checkDomain()
-    checkDomainApp
+    CheckDomainApp = CheckDomain()
+    CheckDomainApp
