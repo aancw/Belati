@@ -62,11 +62,11 @@ class Belati(object):
 
         if domain is not None:
             self.show_banner()
-            #self.check_domain("http://" + domain)
-            #self.banner_grab("http://" + domain)
-            #self.enumerate_subdomains(domain)
-            #self.scan_DNS_zone(domain)
-            #self.harvest_email_search(domain)
+            self.check_domain("http://" + domain)
+            self.banner_grab("http://" + domain)
+            self.enumerate_subdomains(domain)
+            self.scan_DNS_zone(domain)
+            self.harvest_email_search(domain)
             self.harvest_document(domain)
 
         if username or email or orgcomp is not None:
