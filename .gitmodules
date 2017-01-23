@@ -1,0 +1,3 @@
+[submodule "CheckMyUsername"]
+        path = lib/CheckMyUsername
+        url = https://github.com/aancw/CheckMyUsername
