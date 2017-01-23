@@ -31,6 +31,7 @@ Just for learning stuff and OSINT purpose. Correct me if i'm wrong
 ## Install/Usage
 ```
 git clone https://github.com/aancw/Belati.git
+git submodule update --init --recursive
 pip2 install -r requirements.txt
 sudo su
 python Belati.py --help
