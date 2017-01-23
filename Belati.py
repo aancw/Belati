@@ -30,6 +30,7 @@ from plugins.harvest_public_document import HarvestPublicDocument
 from plugins.scan_nmap import ScanNmap
 from plugins.wappalyzer import Wappalyzer
 from lib.Sublist3r import sublist3r
+from lib.CheckMyUsername.check_my_username import CheckMyUsername
 from dnsknife.scanner import Scanner
 import dns.resolver
 
@@ -60,8 +61,9 @@ class Belati(object):
         email = results.email
         orgcomp = results.orgcomp
 
+        self.show_banner()
+
         if domain is not None:
-            self.show_banner()
             self.check_domain("http://" + domain)
             self.banner_grab("http://" + domain)
             self.enumerate_subdomains(domain)
@@ -69,7 +71,11 @@ class Belati(object):
             self.harvest_email_search(domain)
             self.harvest_document(domain)
 
-        if username or email or orgcomp is not None:
+        if username is not None:
+            self.username_checker(username)
+
+
+        if email or orgcomp is not None:
             log.console_log("This feature will be coming soon. Be patient :)")
 
         log.console_log(Y + "All done sir! All log saved in log directory and dowloaded file saved in belatiFiles" + W)
@@ -185,6 +191,14 @@ class Belati(object):
         log.console_log(G + "[*] Perfoming Public Document Harvest from Google..." +  W)
         public_doc = HarvestPublicDocument()
         public_doc.init_crawl(domain_name)
+
+    def username_checker(self, username):
+        log.console_log(G + "[*] Perfoming Username Availability Checker..." + W)
+        user_check = CheckMyUsername()
+        username_status_result = user_check.check_username_availability(username)
+
+        for result in username_status_result:
+            log.console_log(G + "[+] " + result[0] + " => " + result[1] + ": " + result[2])
 
     def timeLimitHandler(self, signum, frame):
         print("No Response...")
