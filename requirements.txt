@@ -10,3 +10,4 @@ termcolor
 colorama
 validators
 tqdm
+tldextract

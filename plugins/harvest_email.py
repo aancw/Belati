@@ -40,7 +40,7 @@ class HarvestEmail(object):
             dataFix = [x for x in dataEmail if not x.startswith('x22') and not x.startswith('3D') and not x.startswith('x3d')] # ignore email because bad parsing
             return list(dataFix)
         except urllib2.URLError, e:
-            print(e)
+            return e
 
 if __name__ == '__main__':
     HarvestEmailApp = HarvestEmail()

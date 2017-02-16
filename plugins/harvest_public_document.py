@@ -64,13 +64,13 @@ class HarvestPublicDocument(object):
                 log.console_log(G + "[*] Please wait, lemme download it for you ;) " + W)
                 for files_download in list_files_download:
                     log.no_console_log(files_download.split('/')[-1])
-                    self.download_files(files_download)
+                    self.download_files(files_download, domain)
         except urllib2.URLError, e:
             log.console_log(e)
 
-    def download_files(self, url):
+    def download_files(self, url, folder_domain):
         filename = url.split('/')[-1]
-        full_filename = 'belatiFiles/%s' % filename
+        full_filename = 'belatiFiles/%s/%s' % folder_domain, filename
         if not os.path.exists(os.path.dirname(full_filename)):
             try:
                 os.makedirs(os.path.dirname(full_filename))

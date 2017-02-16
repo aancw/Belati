@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+    #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 #   Belati is tool for Collecting Public Data & Public Document from Website and other service for OSINT purpose.
@@ -33,6 +33,7 @@ from lib.Sublist3r import sublist3r
 from lib.CheckMyUsername.check_my_username import CheckMyUsername
 from dnsknife.scanner import Scanner
 import dns.resolver
+import tldextract
 
 
 # Console color
@@ -64,16 +65,24 @@ class Belati(object):
         self.show_banner()
 
         if domain is not None:
+            extract_domain = tldextract.extract(domain)
             self.check_domain("http://" + domain)
             self.banner_grab("http://" + domain)
-            self.enumerate_subdomains(domain)
-            self.scan_DNS_zone(domain)
-            self.harvest_email_search(domain)
+
+            if extract_domain.subdomain == "":
+                self.enumerate_subdomains(domain)
+                self.scan_DNS_zone(domain)
+                self.harvest_email_search(domain)
+            else:
+                domain = extract_domain.domain + '.' + extract_domain.suffix
+                self.enumerate_subdomains(domain)
+                self.scan_DNS_zone(domain)
+                self.harvest_email_search(domain)
+
             self.harvest_document(domain)
 
         if username is not None:
             self.username_checker(username)
-
 
         if email or orgcomp is not None:
             log.console_log("This feature will be coming soon. Be patient :)")
@@ -82,13 +91,17 @@ class Belati(object):
 
     def show_banner(self):
         banner = """
-         ____  _____ _        _  _____ ___
-        | __ )| ____| |      / \|_   _|_ _|
-        |  _ \|  _| | |     / _ \ | |  | |
-        | |_) | |___| |___ / ___ \| |  | |
-        |____/|_____|_____/_/   \_\_| |___|
 
+         /$$$$$$$  /$$$$$$$$ /$$        /$$$$$$  /$$$$$$$$ /$$$$$$
+        | $$__  $$| $$_____/| $$       /$$__  $$|__  $$__/|_  $$_/
+        | $$  \ $$| $$      | $$      | $$  \ $$   | $$     | $$
+        | $$$$$$$ | $$$$$   | $$      | $$$$$$$$   | $$     | $$
+        | $$__  $$| $$__/   | $$      | $$__  $$   | $$     | $$
+        | $$  \ $$| $$      | $$      | $$  | $$   | $$     | $$
+        | $$$$$$$/| $$$$$$$$| $$$$$$$$| $$  | $$   | $$    /$$$$$$
+        |_______/ |________/|________/|__/  |__/   |__/   |______/
 
+                                                         
         =[ Belati v0.1-dev by Petruknisme]=
 
         + -- --=[ Collecting Public Data & Public Document for OSINT purpose ]=-- -- +
@@ -184,8 +197,11 @@ class Belati(object):
         log.console_log(G + "[*] Perfoming Email Harvest from Google Search..." + W)
         harvest = HarvestEmail()
         harvest_result = harvest.crawl_search(domain_name)
-        log.console_log(Y + "[*] Found " + str(len(harvest_result)) + " emails on domain " + domain_name + W)
-        log.console_log(R + '\n'.join(harvest_result) + W)
+        try:
+            log.console_log(Y + "[*] Found " + str(len(harvest_result)) + " emails on domain " + domain_name + W)
+            log.console_log(R + '\n'.join(harvest_result) + W)
+        except Exception, exc:
+            log.console_log(R + "[-] Not found or Unavailable. " + str(harvest_result) + W)
 
     def harvest_document(self, domain_name):
         log.console_log(G + "[*] Perfoming Public Document Harvest from Google..." +  W)
