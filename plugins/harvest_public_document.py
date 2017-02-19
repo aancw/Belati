@@ -61,7 +61,7 @@ class HarvestPublicDocument(object):
             list_files_download = list(set(data))
             total_files = str(len(list_files_download))
             log.console_log(Y + "[*] Found " + total_files + " " + extension.upper() + " files!" + W )
-            if total_files is not 0:
+            if total_files != "0":
                 log.console_log(G + "[*] Please wait, lemme download it for you ;) " + W)
                 for files_download in list_files_download:
                     log.no_console_log(files_download.split('/')[-1])
@@ -71,7 +71,7 @@ class HarvestPublicDocument(object):
 
     def download_files(self, url, folder_domain):
         filename = url.split('/')[-1]
-        full_filename = 'belatiFiles/%s/%s' % folder_domain, filename
+        full_filename = 'belatiFiles/{}/{}'.format(folder_domain, filename)
         if not os.path.exists(os.path.dirname(full_filename)):
             try:
                 os.makedirs(os.path.dirname(full_filename))
