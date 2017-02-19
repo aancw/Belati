@@ -4,7 +4,6 @@
 #   Belati is tool for Collecting Public Data & Public Document from Website and other service for OSINT purpose.
 #   This tools is inspired by Foca and Datasploit for OSINT
 #   Copyright (C) 2017  cacaddv@gmail.com (Petruknisme a.k.a Aan Wahyu)
-#   Version 0.1-dev
 
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,8 +24,10 @@ from lib.pywhois import whois
 from logger import Logger
 import urllib2
 import sys
+from user_agents import UserAgents
 
 log = Logger()
+ua = UserAgents()
 
 class CheckDomain(object):
 	def domain_checker(self, domain_name):
@@ -43,7 +44,7 @@ class CheckDomain(object):
 				log.console_log("OK!")
 
 	def alive_check(self, domain_name):
-		request = urllib2.Request(domain_name, headers={'User-Agent' : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"})
+		request = urllib2.Request(domain_name, headers={'User-Agent' : ua.get_user_agent() })
 		try:
 			urllib2.urlopen(request)
 			log.console_log("OK!")

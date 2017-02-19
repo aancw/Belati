@@ -4,7 +4,6 @@
 #   Belati is tool for Collecting Public Data & Public Document from Website and other service for OSINT purpose.
 #   This tools is inspired by Foca and Datasploit for OSINT
 #   Copyright (C) 2017  cacaddv@gmail.com (Petruknisme a.k.a Aan Wahyu)
-#   Version 0.1-dev
 
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -48,13 +47,13 @@ log = Logger()
 class Belati(object):
     def __init__(self):
         # Passing arguments
-        parser = argparse.ArgumentParser(description='=[ Belati v0.1-dev by Petruknisme]')
+        parser = argparse.ArgumentParser(description='=[ Belati v0.1.2-dev by Petruknisme]')
         parser.add_argument('-d', action='store', dest='domain' , help='Perform OSINT from Domain e.g petruknisme.com')
         parser.add_argument('-u', action='store', dest='username' , help='Perform OSINT from username e.g petruknisme')
         parser.add_argument('-e', action='store', dest='email' , help='Perform OSINT from email address')
         parser.add_argument('-c', action='store', dest='orgcomp' , help='Perform OSINT from Organization or Company Name')
         parser.add_argument('-o', action='store', dest='output_files' , help='Save log for output files')
-        parser.add_argument('--version', action='version', version='=[ Belati v0.1-dev by Petruknisme]')
+        parser.add_argument('--version', action='version', version='=[ Belati v0.1.2-dev by Petruknisme]')
         results = parser.parse_args()
 
         domain = results.domain
@@ -101,8 +100,8 @@ class Belati(object):
         | $$$$$$$/| $$$$$$$$| $$$$$$$$| $$  | $$   | $$    /$$$$$$
         |_______/ |________/|________/|__/  |__/   |__/   |______/
 
-                                                         
-        =[ Belati v0.1-dev by Petruknisme]=
+
+        =[ Belati v0.1.2-dev by Petruknisme]=
 
         + -- --=[ Collecting Public Data & Public Document for OSINT purpose ]=-- -- +
         + -- --=[ https://petruknisme.com ]=-- -- +

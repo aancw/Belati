@@ -13,6 +13,7 @@ Just for learning stuff and OSINT purpose. Correct me if i'm wrong
 - DNS mapping / Zone Scanning
 - Mail Harvester from Website & Search Engine
 - Scrapping Public Document for Domain from Search Engine
+- Fake and Random User Agent ( Prevent from blocking )
 
 ## TODO
 - Automatic OSINT with Username and Email support
@@ -60,6 +61,8 @@ Don't worry. Belati still running when you are run with normal user ;)
 - colorama
 - validators
 - tqdm
+- tldextract
+- fake-useragent
 
 ## Library
 - python-whois

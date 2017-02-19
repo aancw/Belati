@@ -4,7 +4,6 @@
 #   Belati is tool for Collecting Public Data & Public Document from Website and other service for OSINT purpose.
 #   This tools is inspired by Foca and Datasploit for OSINT
 #   Copyright (C) 2017  cacaddv@gmail.com (Petruknisme a.k.a Aan Wahyu)
-#   Version 0.1-dev
 
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -26,6 +25,7 @@ import urllib2, urllib
 from logger import Logger
 from tqdm import tqdm
 import requests
+from user_agents import UserAgents
 
 # Console color
 G = '\033[92m'  # green
@@ -35,6 +35,7 @@ R = '\033[91m'  # red
 W = '\033[0m'   # white
 
 log = Logger()
+ua = UserAgents()
 
 class HarvestPublicDocument(object):
     def init_crawl(self, domain):
@@ -53,7 +54,7 @@ class HarvestPublicDocument(object):
         total_files = 0
         try:
             url = 'https://www.google.com/search?q=site:' + domain + '%20ext:' + extension + '&filter=0&num=200'
-            req = urllib2.Request(url, headers={'User-Agent' : "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:19.0) Gecko/20100101 Firefox/49.0"})
+            req = urllib2.Request(url, headers={'User-Agent' : ua.get_user_agent() })
             data = urllib2.urlopen(req).read()
             regex = "(?P<url>https?://[^:]+\.%s)" % extension
             data = re.findall(regex, data)

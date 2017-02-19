@@ -4,7 +4,6 @@
 #   Belati is tool for Collecting Public Data & Public Document from Website and other service for OSINT purpose.
 #   This tools is inspired by Foca and Datasploit for OSINT
 #   Copyright (C) 2017  cacaddv@gmail.com (Petruknisme a.k.a Aan Wahyu)
-#   Version 0.1-dev
 
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -21,17 +20,20 @@
 
 # This file is part of Belati project
 
-import sys, re, time
-import urllib2
-
 # This is part of MailHarvester and EMINGOO regex
 # Thanks to pantuts and maldevel
+
+import sys, re, time
+import urllib2
+from user_agents import UserAgents
+
+ua = UserAgents()
 
 class HarvestEmail(object):
     def crawl_search(self, domain):
         try:
             url = 'https://www.google.com/search?num=200&start=0&filter=0&hl=en&q=@' + domain
-            req = urllib2.Request(url, headers={'User-Agent' : "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:19.0) Gecko/20100101 Firefox/49.0"})
+            req = urllib2.Request(url, headers={'User-Agent' : ua.get_user_agent() })
             data = urllib2.urlopen(req).read()
             dataStrip = re.sub('<[^<]+?>', '', data) # strip all html tags like <em>
             dataStrip1 =  re.findall(r'[a-zA-Z0-9._+-]+@[a-zA-Z0-9._+-]+' + domain, dataStrip)

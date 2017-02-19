@@ -11,3 +11,4 @@ colorama
 validators
 tqdm
 tldextract
+fake-useragent

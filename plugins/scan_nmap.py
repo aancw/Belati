@@ -4,7 +4,6 @@
 #   Belati is tool for Collecting Public Data & Public Document from Website and other service for OSINT purpose.
 #   This tools is inspired by Foca and Datasploit for OSINT
 #   Copyright (C) 2017  cacaddv@gmail.com (Petruknisme a.k.a Aan Wahyu)
-#   Version 0.1-dev
 
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by

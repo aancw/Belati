@@ -20,22 +20,19 @@
 
 # This file is part of Belati project
 
-from Wappalyzer import Wappalyzer, WebPage
-from logger import Logger
+from fake_useragent import UserAgent
+from fake_useragent import FakeUserAgentError
+ua = UserAgent()
 
-log = Logger()
-
-class Wappalyzer(object):
-    def run_wappalyze(self, domain):
-        analyzer = Wappalyzer.latest()
-        webpage = WebPage.new_from_url(domain)
-        analyze_result = analyzer.analyze(webpage)
-        if analyze_result:
-            for result in analyze_result:
-                log.console_log(result)
-        else:
-            log.console_log("Result Not Found")
+class UserAgents(object):
+    def get_user_agent(self):
+        try:
+            return ua.random
+        except FakeUserAgentError:
+            return "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:19.0) Gecko/20100101 Firefox/49.0"
+    def update_user_agent(self):
+        ua.update()
 
 if __name__ == '__main__':
-    wappalyzerApp = wappalyzer()
-    wappalyzerApp
+    UserAgentsApp = UserAgents()
+    UserAgentsApp
