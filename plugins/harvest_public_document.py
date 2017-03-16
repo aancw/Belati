@@ -26,6 +26,8 @@ from logger import Logger
 from tqdm import tqdm
 import requests
 from user_agents import UserAgents
+from urlparse import urlparse
+import random
 
 # Console color
 G = '\033[92m'  # green
@@ -38,23 +40,37 @@ log = Logger()
 ua = UserAgents()
 
 class HarvestPublicDocument(object):
-    def init_crawl(self, domain):
+    def init_crawl(self, domain, proxy_address):
         log.console_log(G + "[*] Gather Link from Google Search for domain " + domain + W)
-        self.harvest_public_doc(domain, "pdf")
-        self.harvest_public_doc(domain, "doc")
-        self.harvest_public_doc(domain, "xls")
-        self.harvest_public_doc(domain, "odt")
-        self.harvest_public_doc(domain, "ppt")
-        self.harvest_public_doc(domain, "rtf")
-        self.harvest_public_doc(domain, "txt")
+        self.harvest_public_doc(domain, "pdf", proxy_address)
+        self.harvest_public_doc(domain, "doc", proxy_address)
+        self.harvest_public_doc(domain, "xls", proxy_address)
+        self.harvest_public_doc(domain, "odt", proxy_address)
+        self.harvest_public_doc(domain, "ppt", proxy_address)
+        self.harvest_public_doc(domain, "rtf", proxy_address)
+        self.harvest_public_doc(domain, "txt", proxy_address)
         #https://www.google.com/search?q=site:domain.com%20ext:pdf&filter=0&num=100#q=site:domain.com+ext:txt&start=100&filter=0
 
-    def harvest_public_doc(self, domain, extension):
+    def harvest_public_doc(self, domain, extension, proxy_address):
         log.console_log(G + "[*] Searching " + extension.upper() + " Document..." + W)
         total_files = 0
         try:
+            if type(proxy_address) is list:
+                # Get random proxy from list
+                proxy_address_fix = random.choice(proxy_address)
+            else:
+                proxy_address_fix = proxy_address
+
+            log.console_log(Y + "[*] Using Proxy Address : " + proxy_address_fix + W)
             url = 'https://www.google.com/search?q=site:' + domain + '%20ext:' + extension + '&filter=0&num=200'
-            req = urllib2.Request(url, headers={'User-Agent' : ua.get_user_agent() })
+            parse = urlparse(proxy_address_fix)
+            proxy_scheme = parse.scheme
+            proxy = str(parse.hostname) + ':' + str(parse.port)
+            proxy_handler = urllib2.ProxyHandler({ proxy_scheme: proxy})
+            opener = urllib2.build_opener(proxy_handler)
+            opener.addheaders = [('User-agent', ua.get_user_agent() )]
+            urllib2.install_opener(opener)
+            req = urllib2.Request(url)
             data = urllib2.urlopen(req).read()
             regex = "(?P<url>https?://[^:]+\.%s)" % extension
             data = re.findall(regex, data)
@@ -62,7 +78,7 @@ class HarvestPublicDocument(object):
             total_files = str(len(list_files_download))
             log.console_log(Y + "[*] Found " + total_files + " " + extension.upper() + " files!" + W )
             if total_files != "0":
-                log.console_log(G + "[*] Please wait, lemme download it for you ;) " + W)
+                log.console_log(G + "[*] Please wait, lemme download it for you ;) [NO PROXY] " + W)
                 for files_download in list_files_download:
                     log.no_console_log(files_download.split('/')[-1])
                     self.download_files(files_download, domain)

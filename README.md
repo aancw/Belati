@@ -14,6 +14,7 @@ Just for learning stuff and OSINT purpose. Correct me if i'm wrong
 - Mail Harvester from Website & Search Engine
 - Scrapping Public Document for Domain from Search Engine
 - Fake and Random User Agent ( Prevent from blocking )
+- Proxy Support for Harvesting Emails and Documents
 
 ## TODO
 - Automatic OSINT with Username and Email support
@@ -26,19 +27,22 @@ Just for learning stuff and OSINT purpose. Correct me if i'm wrong
 - Metadata Extractor
 - Database Support
 - Web version with Django
-- Proxy Support for Harvesting
 - Scanning Report export to PDF
 
 ## Install/Usage
 ```
 git clone https://github.com/aancw/Belati.git
 git submodule update --init --recursive
-pip2 install -r requirements.txt
+pip install -r requirements.txt #please use pip with python v2
 sudo su
 python Belati.py --help
 ```
 
 Still on progress. Be patient.
+
+## Python Requirements
+
+This tool not compatible with Python 3. I need to migrate this later. So use python v2.7 instead!
 
 ## Why Need Root Privilege?
 
@@ -78,3 +82,22 @@ Aan Wahyu a.k.a Petruknisme(https://petruknisme.com)
 
 ## License
 Belati is licensed under GPL V2. You can use, modify, or redistribute this tool under the terms of GNU General Public License (GPLv2).
+
+```
+    Belati is tool for Collecting Public Data & Public Document from Website and other service for OSINT purpose.
+    This tools is inspired by Foca and Datasploit for OSINT
+    Copyright (C) 2017  cacaddv@gmail.com (Petruknisme a.k.a Aan Wahyu)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+```

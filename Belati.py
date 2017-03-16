@@ -1,4 +1,4 @@
-    #!/usr/bin/env python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 #   Belati is tool for Collecting Public Data & Public Document from Website and other service for OSINT purpose.
@@ -21,6 +21,9 @@
 import argparse
 import urllib2
 import sys, signal, socket
+import time
+import dns.resolver
+import tldextract
 from plugins.check_domain import CheckDomain
 from plugins.banner_grab import BannerGrab
 from plugins.logger import Logger
@@ -31,9 +34,7 @@ from plugins.wappalyzer import Wappalyzer
 from lib.Sublist3r import sublist3r
 from lib.CheckMyUsername.check_my_username import CheckMyUsername
 from dnsknife.scanner import Scanner
-import dns.resolver
-import tldextract
-
+from urlparse import urlparse
 
 # Console color
 G = '\033[92m'  # green
@@ -47,23 +48,44 @@ log = Logger()
 class Belati(object):
     def __init__(self):
         # Passing arguments
-        parser = argparse.ArgumentParser(description='=[ Belati v0.1.2-dev by Petruknisme]')
+        parser = argparse.ArgumentParser(description='=[ Belati v0.1.3-dev by Petruknisme]')
         parser.add_argument('-d', action='store', dest='domain' , help='Perform OSINT from Domain e.g petruknisme.com')
         parser.add_argument('-u', action='store', dest='username' , help='Perform OSINT from username e.g petruknisme')
         parser.add_argument('-e', action='store', dest='email' , help='Perform OSINT from email address')
         parser.add_argument('-c', action='store', dest='orgcomp' , help='Perform OSINT from Organization or Company Name')
         parser.add_argument('-o', action='store', dest='output_files' , help='Save log for output files')
-        parser.add_argument('--version', action='version', version='=[ Belati v0.1.2-dev by Petruknisme]')
+        parser.add_argument('--single-proxy', action='store', dest='single_proxy', help='Proxy support with single IP (ex: http://127.0.0.1:8080)' )
+        parser.add_argument('--proxy-file', action='store', dest='proxy_file_location', help='Proxy support from Proxy List File')
+        parser.add_argument('--auto-proxy', action='store_true', dest='auto_proxy', default=True, help='Auto Proxy Support( Coming soon )' )
+        parser.add_argument('--version', action='version', version='=[ Belati v0.1.3-dev by Petruknisme]')
         results = parser.parse_args()
 
         domain = results.domain
         username = results.username
         email = results.email
         orgcomp = results.orgcomp
+        single_proxy = results.single_proxy
+        proxy_file_location = results.proxy_file_location
+        proxy = ""
+        self.multiple_proxy_list = []
 
         self.show_banner()
 
         if domain is not None:
+
+            if single_proxy is not None:
+                log.console_log(G + "[*] Checking Proxy Status..." + W)
+                if self.check_single_proxy_status(single_proxy, "http://" + str(domain)) == 'ok':
+                    proxy = single_proxy
+                else:
+                    log.console_log(R +'[-] Please use another proxy or disable proxy!' + W)
+                    sys.exit()
+
+            if proxy_file_location is not None:
+                log.console_log(G + "[*] Checking Proxy Status from file " + proxy_file_location + W)
+                self.check_multiple_proxy_status(proxy_file_location, "http://" + str(domain))
+                proxy = self.multiple_proxy_list
+
             extract_domain = tldextract.extract(domain)
             self.check_domain("http://" + domain)
             self.banner_grab("http://" + domain)
@@ -71,14 +93,14 @@ class Belati(object):
             if extract_domain.subdomain == "":
                 self.enumerate_subdomains(domain)
                 self.scan_DNS_zone(domain)
-                self.harvest_email_search(domain)
+                self.harvest_email_search(domain, proxy)
             else:
                 domain = extract_domain.domain + '.' + extract_domain.suffix
                 self.enumerate_subdomains(domain)
                 self.scan_DNS_zone(domain)
-                self.harvest_email_search(domain)
+                self.harvest_email_search(domain, proxy)
 
-            self.harvest_document(domain)
+            self.harvest_document(domain, proxy)
 
         if username is not None:
             self.username_checker(username)
@@ -101,7 +123,7 @@ class Belati(object):
         |_______/ |________/|________/|__/  |__/   |__/   |______/
 
 
-        =[ Belati v0.1.2-dev by Petruknisme]=
+        =[ Belati v0.1.3-dev by Petruknisme]=
 
         + -- --=[ Collecting Public Data & Public Document for OSINT purpose ]=-- -- +
         + -- --=[ https://petruknisme.com ]=-- -- +
@@ -192,20 +214,20 @@ class Belati(object):
         except Exception, exc:
             print(R + "[*] No response from server... SKIP!" + W)
 
-    def harvest_email_search(self, domain_name):
+    def harvest_email_search(self, domain_name, proxy_address):
         log.console_log(G + "[*] Perfoming Email Harvest from Google Search..." + W)
         harvest = HarvestEmail()
-        harvest_result = harvest.crawl_search(domain_name)
+        harvest_result = harvest.crawl_search(domain_name, proxy_address)
         try:
             log.console_log(Y + "[*] Found " + str(len(harvest_result)) + " emails on domain " + domain_name + W)
             log.console_log(R + '\n'.join(harvest_result) + W)
         except Exception, exc:
             log.console_log(R + "[-] Not found or Unavailable. " + str(harvest_result) + W)
 
-    def harvest_document(self, domain_name):
+    def harvest_document(self, domain_name, proxy_address):
         log.console_log(G + "[*] Perfoming Public Document Harvest from Google..." +  W)
         public_doc = HarvestPublicDocument()
-        public_doc.init_crawl(domain_name)
+        public_doc.init_crawl(domain_name, proxy_address)
 
     def username_checker(self, username):
         log.console_log(G + "[*] Perfoming Username Availability Checker..." + W)
@@ -214,6 +236,46 @@ class Belati(object):
 
         for result in username_status_result:
             log.console_log(G + "[+] " + result[0] + " => " + result[1] + ": " + result[2])
+
+    def check_single_proxy_status(self, proxy_address, domain_check):
+        try:
+            parse = urlparse(proxy_address)
+            proxy_scheme = parse.scheme
+            proxy = str(parse.hostname) + ':' + str(parse.port)
+            proxy_handler = urllib2.ProxyHandler({ proxy_scheme: proxy})
+            opener = urllib2.build_opener(proxy_handler)
+            opener.addheaders = [('User-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36')]
+            urllib2.install_opener(opener)
+            req = urllib2.Request(domain_check)
+            start_time = time.time()
+            sock = urllib2.urlopen(req)
+            end_time = time.time()
+            diff_time = round(end_time - start_time, 3)
+            log.console_log(Y + "[+] " + proxy_address + " OK! Response Time : " + str(diff_time) + "s" + W)
+            return 'ok'
+        except urllib2.HTTPError, e:
+            print('Error code: ' + str(e.code))
+            return e.code
+        except Exception, detail:
+            print('ERROR ' +  str(detail))
+            return 1
+
+    def check_multiple_proxy_status(self, file_location, domain_check):
+        with open(file_location) as data:
+            text = [line.rstrip('\n') for line in data]
+            for proxy in text:
+                if self.check_single_proxy_status(str(proxy), str(domain_check)) == 'ok':
+                     self.multiple_proxy_list.append(proxy)
+
+    def check_python_version(self):
+        if sys.version[:3] == "2.7" or "2" in sys.version[:3]:
+            log.console_log(G + "[*] Python version OK! " + sys.version[:6] + W)
+        elif "3" in sys.version[:3]:
+            log.console_log(Y + "[-] Nope. This system not yet compatible for Python 3!" + W)
+            sys.exit()
+        else:
+            log.console_log(Y + "[-] Duh. Your python version too old for running this :(")
+            sys.exit()
 
     def timeLimitHandler(self, signum, frame):
         print("No Response...")

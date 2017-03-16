@@ -6,3 +6,4 @@ logs/*
 .directory
 lib/.directory
 plugins/.directory
+proxy.txt
