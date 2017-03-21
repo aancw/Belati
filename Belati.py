@@ -31,6 +31,7 @@ from plugins.harvest_email import HarvestEmail
 from plugins.harvest_public_document import HarvestPublicDocument
 from plugins.scan_nmap import ScanNmap
 from plugins.wappalyzer import Wappalyzer
+from plugins.git_finder import GitFinder
 from lib.Sublist3r import sublist3r
 from lib.CheckMyUsername.check_my_username import CheckMyUsername
 from dnsknife.scanner import Scanner
@@ -91,12 +92,12 @@ class Belati(object):
             self.banner_grab("http://" + domain)
 
             if extract_domain.subdomain == "":
-                self.enumerate_subdomains(domain)
+                self.enumerate_subdomains(domain, proxy)
                 self.scan_DNS_zone(domain)
                 self.harvest_email_search(domain, proxy)
             else:
                 domain = extract_domain.domain + '.' + extract_domain.suffix
-                self.enumerate_subdomains(domain)
+                self.enumerate_subdomains(domain, proxy)
                 self.scan_DNS_zone(domain)
                 self.harvest_email_search(domain, proxy)
 
@@ -157,7 +158,7 @@ class Belati(object):
         log.console_log(G + "[*] Perfoming HTTP Banner Grabbing..." + W)
         banner.show_banner(domain_name)
 
-    def enumerate_subdomains(self, domain_name):
+    def enumerate_subdomains(self, domain_name, proxy):
         log.console_log(G + "[*] Perfoming Subdomains Enumeration..." + W)
         subdomain_list = sublist3r.main(domain_name, 100, "", ports=None, silent=False, verbose=False, enable_bruteforce=False, engines=None)
         subdomain_ip_list = []
@@ -165,6 +166,7 @@ class Belati(object):
         log.console_log(G + "[*] Perfoming Wapplyzing Web Page..." + W)
         for subdomain in subdomain_list:
             self.wapplyzing_webpage(subdomain)
+            self.public_git_finder(subdomain, proxy)
             try:
                 subdomain_ip_list.append(socket.gethostbyname(subdomain))
             except socket.gaierror:
@@ -266,6 +268,14 @@ class Belati(object):
             for proxy in text:
                 if self.check_single_proxy_status(str(proxy), str(domain_check)) == 'ok':
                      self.multiple_proxy_list.append(proxy)
+
+    def public_git_finder(self, domain, proxy_address):
+        log.console_log(G + "[*] Checking Public GIT Directory on domain " + domain + W)
+        git_finder = GitFinder()
+        if git_finder.check_git(domain, proxy_address) == True:
+            log.console_log(G + "[+] Gotcha! You are in luck boy!" + W)
+        else:
+            log.console_log(Y + "[-] Oh. Don't be sad :(")
 
     def check_python_version(self):
         if sys.version[:3] == "2.7" or "2" in sys.version[:3]:

@@ -21,15 +21,18 @@
 # This file is part of Belati project
 
 from Wappalyzer import Wappalyzer, WebPage
+from user_agents import UserAgents
 from logger import Logger
 
 log = Logger()
+ua = UserAgents()
+
 
 class Wappalyzer(object):
     def run_wappalyze(self, domain):
         analyzer = Wappalyzer.latest()
         webpage = WebPage.new_from_url(domain)
-        analyze_result = analyzer.analyze(webpage)
+        analyze_result = analyzer.analyze(webpage, user_agent= ua.get_user_agent() )
         if analyze_result:
             for result in analyze_result:
                 log.console_log(result)

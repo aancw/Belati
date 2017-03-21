@@ -61,7 +61,9 @@ class HarvestPublicDocument(object):
             else:
                 proxy_address_fix = proxy_address
 
-            log.console_log(Y + "[*] Using Proxy Address : " + proxy_address_fix + W)
+            if proxy_address is not "":
+                log.console_log(Y + "[*] Using Proxy Address : " + proxy_address_fix + W)
+
             url = 'https://www.google.com/search?q=site:' + domain + '%20ext:' + extension + '&filter=0&num=200'
             parse = urlparse(proxy_address_fix)
             proxy_scheme = parse.scheme

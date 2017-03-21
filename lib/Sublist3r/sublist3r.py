@@ -1010,7 +1010,7 @@ def main(domain, threads, savefile, ports, silent, verbose, enable_bruteforce, e
                     geo = geolite2.lookup(socket.gethostbyname(subdomain))
                     if geo:
                         table.add_rows([["Subdomain", "IP Address", "Location"],
-                    [subdomain,    socket.gethostbyname(subdomain), geo.country + " - " + str(geo.location)]])
+                    [subdomain,    socket.gethostbyname(subdomain), str(geo.country) + " - " + str(geo.location)]])
                     else:
                         table.add_rows([["Subdomain", "IP Address", "Location"],
                     [subdomain,    socket.gethostbyname(subdomain), "-"]])
