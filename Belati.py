@@ -49,7 +49,7 @@ log = Logger()
 class Belati(object):
     def __init__(self):
         # Passing arguments
-        parser = argparse.ArgumentParser(description='=[ Belati v0.1.3-dev by Petruknisme]')
+        parser = argparse.ArgumentParser(description='=[ Belati v0.1.4-dev by Petruknisme] (https://github.com/aancw/Belati)')
         parser.add_argument('-d', action='store', dest='domain' , help='Perform OSINT from Domain e.g petruknisme.com')
         parser.add_argument('-u', action='store', dest='username' , help='Perform OSINT from username e.g petruknisme')
         parser.add_argument('-e', action='store', dest='email' , help='Perform OSINT from email address')
@@ -58,7 +58,7 @@ class Belati(object):
         parser.add_argument('--single-proxy', action='store', dest='single_proxy', help='Proxy support with single IP (ex: http://127.0.0.1:8080)' )
         parser.add_argument('--proxy-file', action='store', dest='proxy_file_location', help='Proxy support from Proxy List File')
         parser.add_argument('--auto-proxy', action='store_true', dest='auto_proxy', default=True, help='Auto Proxy Support( Coming soon )' )
-        parser.add_argument('--version', action='version', version='=[ Belati v0.1.3-dev by Petruknisme]')
+        parser.add_argument('--version', action='version', version='=[ Belati v0.1.4-dev by Petruknisme] (https://github.com/aancw/Belati)')
         results = parser.parse_args()
 
         domain = results.domain
@@ -95,11 +95,13 @@ class Belati(object):
                 self.enumerate_subdomains(domain, proxy)
                 self.scan_DNS_zone(domain)
                 self.harvest_email_search(domain, proxy)
+                self.harvest_email_pgp(domain, proxy)
             else:
                 domain = extract_domain.domain + '.' + extract_domain.suffix
                 self.enumerate_subdomains(domain, proxy)
                 self.scan_DNS_zone(domain)
                 self.harvest_email_search(domain, proxy)
+                self.harvest_email_pgp(domain, proxy)
 
             self.harvest_document(domain, proxy)
 
@@ -124,7 +126,7 @@ class Belati(object):
         |_______/ |________/|________/|__/  |__/   |__/   |______/
 
 
-        =[ Belati v0.1.3-dev by Petruknisme]=
+        =[ Belati v0.1.4-dev by Petruknisme]=
 
         + -- --=[ Collecting Public Data & Public Document for OSINT purpose ]=-- -- +
         + -- --=[ https://petruknisme.com ]=-- -- +
@@ -163,8 +165,8 @@ class Belati(object):
         subdomain_list = sublist3r.main(domain_name, 100, "", ports=None, silent=False, verbose=False, enable_bruteforce=False, engines=None)
         subdomain_ip_list = []
 
-        log.console_log(G + "[*] Perfoming Wapplyzing Web Page..." + W)
         for subdomain in subdomain_list:
+            self.banner_grab("http://" + subdomain)
             self.wapplyzing_webpage(subdomain)
             self.public_git_finder(subdomain, proxy)
             try:
@@ -225,6 +227,16 @@ class Belati(object):
             log.console_log(R + '\n'.join(harvest_result) + W)
         except Exception, exc:
             log.console_log(R + "[-] Not found or Unavailable. " + str(harvest_result) + W)
+
+    def harvest_email_pgp(self, domain_name, proxy_address):
+        harvest = HarvestEmail()
+        harvest_result = harvest.crawl_pgp_mit_edu(domain_name, proxy_address)
+        try:
+            log.console_log(Y + "[*] Found " + str(len(harvest_result)) + " emails on domain " + domain_name + W)
+            log.console_log(R + '\n'.join(harvest_result) + W)
+        except Exception, exc:
+            log.console_log(R + "[-] Not found or Unavailable. " + str(harvest_result) + W)
+
 
     def harvest_document(self, domain_name, proxy_address):
         log.console_log(G + "[*] Perfoming Public Document Harvest from Google..." +  W)

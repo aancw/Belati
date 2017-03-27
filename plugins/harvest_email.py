@@ -71,6 +71,35 @@ class HarvestEmail(object):
         except urllib2.URLError, e:
             return e
 
+    def crawl_pgp_mit_edu(self, domain, proxy_address):
+        try:
+            if type(proxy_address) is list:
+                # Get random proxy from list
+                proxy_address_fix = random.choice(proxy_address)
+            else:
+                proxy_address_fix = proxy_address
+
+            if proxy_address is not "":
+                log.console_log(Y + "[*] Using Proxy Address : " + proxy_address_fix + W)
+
+            url = 'http://pgp.mit.edu:11371/pks/lookup?op=index&search=' + domain
+            parse = urlparse(proxy_address_fix)
+            proxy_scheme = parse.scheme
+            proxy = str(parse.hostname) + ':' + str(parse.port)
+            proxy_handler = urllib2.ProxyHandler({ proxy_scheme: proxy})
+            opener = urllib2.build_opener(proxy_handler)
+            opener.addheaders = [('User-agent', 'Googlebot/3.1 (+http://www.googlebot.com/bot.html)' )]
+            urllib2.install_opener(opener)
+            req = urllib2.Request(url)
+            data = urllib2.urlopen(req).read()
+            dataStrip = re.sub('<[^<]+?>', '', data) # strip all html tags like <em>
+            dataStrip1 =  re.findall(r'[a-zA-Z0-9._+-]+@[a-zA-Z0-9._+-]+' + domain, dataStrip)
+            dataStrip2 = re.findall(r'[a-zA-Z0-9._+-]+@' + domain, dataStrip)
+            dataEmail = set(dataStrip1 + dataStrip2)
+            return list(dataEmail)
+        except urllib2.URLError, e:
+            return e
+
 if __name__ == '__main__':
     HarvestEmailApp = HarvestEmail()
     HarvestEmailApp
