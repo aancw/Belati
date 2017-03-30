@@ -30,9 +30,16 @@ ua = UserAgents()
 
 class BannerGrab(object):
     def show_banner(self, domain_name):
-        req = urllib2.Request(domain_name, headers={'User-Agent' : ua.get_user_agent() })
-        header = urllib2.urlopen(req).info()
-        log.console_log(header)
+        try:
+            req = urllib2.Request(domain_name, headers={'User-Agent' : ua.get_user_agent() })
+            header = urllib2.urlopen(req).info()
+            log.console_log(header)
+        except urllib2.HTTPError, e:
+            print('Error code: ' + str(e.code))
+            return e.code
+        except Exception, detail:
+            print('ERROR ' +  str(detail))
+            return 1
 
 if __name__ == '__main__':
     BannerGrabApp = BannerGrab()

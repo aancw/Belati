@@ -46,7 +46,7 @@ class GitFinder(object):
             proxy_address_fix = proxy_address
 
         if proxy_address is not "":
-            log.console_log(Y + "[*] Using Proxy Address : " + proxy_address_fix + W)
+            log.console_log("{}[*] Using Proxy Address : {}{}".format(Y, proxy_address_fix, W))
 
         url = "http://" + domain + "/.git/HEAD"
         try:
@@ -66,7 +66,7 @@ class GitFinder(object):
                 return True
 
         except urllib2.HTTPError, e:
-            print('Error code: ' + str(e.code))
+            print('Error code: {}'.format( str(e.code)))
             return e.code
         except Exception, detail:
-            print('ERROR ' +  str(detail))
+            print('ERROR {}'.format(str(detail)))

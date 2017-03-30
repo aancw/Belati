@@ -30,6 +30,7 @@ Just for learning stuff and OSINT purpose. Correct me if i'm wrong
 - Database Support
 - Web version with Django
 - Scanning Report export to PDF
+- domain or subdomain reputation checker
 
 ## Install/Usage
 ```

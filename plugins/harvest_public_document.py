@@ -41,7 +41,7 @@ ua = UserAgents()
 
 class HarvestPublicDocument(object):
     def init_crawl(self, domain, proxy_address):
-        log.console_log(G + "[*] Gather Link from Google Search for domain " + domain + W)
+        log.console_log("{}[*] Gather Link from Google Search for domain {}{}".format(G, domain, W))
         self.harvest_public_doc(domain, "pdf", proxy_address)
         self.harvest_public_doc(domain, "doc", proxy_address)
         self.harvest_public_doc(domain, "xls", proxy_address)
@@ -52,7 +52,7 @@ class HarvestPublicDocument(object):
         #https://www.google.com/search?q=site:domain.com%20ext:pdf&filter=0&num=100#q=site:domain.com+ext:txt&start=100&filter=0
 
     def harvest_public_doc(self, domain, extension, proxy_address):
-        log.console_log(G + "[*] Searching " + extension.upper() + " Document..." + W)
+        log.console_log("{}[*] Searching {} Document... {}".format(G, extension.upper(), W))
         total_files = 0
         try:
             if type(proxy_address) is list:
@@ -62,7 +62,7 @@ class HarvestPublicDocument(object):
                 proxy_address_fix = proxy_address
 
             if proxy_address is not "":
-                log.console_log(Y + "[*] Using Proxy Address : " + proxy_address_fix + W)
+                log.console_log("{}[*] Using Proxy Address : {}{}".format(Y, proxy_address_fix, W))
 
             url = 'https://www.google.com/search?q=site:' + domain + '%20ext:' + extension + '&filter=0&num=200'
             parse = urlparse(proxy_address_fix)
@@ -78,9 +78,9 @@ class HarvestPublicDocument(object):
             data = re.findall(regex, data)
             list_files_download = list(set(data))
             total_files = str(len(list_files_download))
-            log.console_log(Y + "[*] Found " + total_files + " " + extension.upper() + " files!" + W )
+            log.console_log("{}[*] Found {} {} files!".format(G, total_files, extension.upper(), W) )
             if total_files != "0":
-                log.console_log(G + "[*] Please wait, lemme download it for you ;) [NO PROXY] " + W)
+                log.console_log("{}[*] Please wait, lemme download it for you ;) [NO PROXY] {}".format(G, W))
                 for files_download in list_files_download:
                     log.no_console_log(files_download.split('/')[-1])
                     self.download_files(files_download, domain)

@@ -50,7 +50,7 @@ class HarvestEmail(object):
                 proxy_address_fix = proxy_address
 
             if proxy_address is not "":
-                log.console_log(Y + "[*] Using Proxy Address : " + proxy_address_fix + W)
+                log.console_log("{}[*] Using Proxy Address : {}{}".format(Y, proxy_address_fix, W))
 
             url = 'https://www.google.com/search?num=200&start=0&filter=0&hl=en&q=@' + domain
             parse = urlparse(proxy_address_fix)
@@ -80,7 +80,7 @@ class HarvestEmail(object):
                 proxy_address_fix = proxy_address
 
             if proxy_address is not "":
-                log.console_log(Y + "[*] Using Proxy Address : " + proxy_address_fix + W)
+                log.console_log("{}[*] Using Proxy Address : {}{}".format(Y, proxy_address_fix, W))
 
             url = 'http://pgp.mit.edu:11371/pks/lookup?op=index&search=' + domain
             parse = urlparse(proxy_address_fix)
