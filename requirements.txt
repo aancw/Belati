@@ -12,3 +12,4 @@ validators
 tqdm
 tldextract
 fake-useragent
+python-Wappalyzer

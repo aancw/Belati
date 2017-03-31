@@ -26,13 +26,12 @@ from logger import Logger
 
 log = Logger()
 ua = UserAgents()
-
+analyzer = Wappalyzer.latest()
 
 class Wappalyzer(object):
     def run_wappalyze(self, domain):
-        analyzer = Wappalyzer.latest()
         webpage = WebPage.new_from_url(domain)
-        analyze_result = analyzer.analyze(webpage, user_agent= ua.get_user_agent() )
+        analyze_result = analyzer.analyze(webpage)
         if analyze_result:
             for result in analyze_result:
                 log.console_log(result)

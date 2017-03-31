@@ -55,6 +55,7 @@ class Belati(object):
         parser.add_argument('-e', action='store', dest='email' , help='Perform OSINT from email address')
         parser.add_argument('-c', action='store', dest='orgcomp' , help='Perform OSINT from Organization or Company Name')
         parser.add_argument('-o', action='store', dest='output_files' , help='Save log for output files')
+        parser.add_argument('--db-file', action='store', dest='db_file_location' , help='Specify Database File Location(SQLite3)')
         parser.add_argument('--single-proxy', action='store', dest='single_proxy', help='Proxy support with single IP (ex: http://127.0.0.1:8080)' )
         parser.add_argument('--proxy-file', action='store', dest='proxy_file_location', help='Proxy support from Proxy List File')
         parser.add_argument('--auto-proxy', action='store_true', dest='auto_proxy', default=True, help='Auto Proxy Support( Coming soon )' )
@@ -137,7 +138,7 @@ class Belati(object):
         {}
         This tool is for educational purposes only.
         Any damage you make will not affect the author.
-        Do It With Your Own Risk!.
+        Do It With Your Own Risk!
 
         For Better Privacy, Please Use proxychains or other proxy service!
         {}
@@ -182,19 +183,27 @@ class Belati(object):
 
     def wapplyzing_webpage(self, domain):
         wappalyzing = Wappalyzer()
-        log.console_log("{}[*] Wapplyzing HTTP on domain {}{}".format(G, domain, W))
         try:
+            log.console_log("{}[*] Wapplyzing HTTP on domain {}{}".format(G, domain, W))
             targeturl = "http://" + domain
             wappalyzing.run_wappalyze(targeturl)
-        except:
-            log.console_log("{}[-] HTTP connection was unavailable {}".format(R, W))
+        except urllib2.URLError as exc:
+            log.console_log('URL Error: {0}'.format(str(exc)))
+        except urllib2.HTTPError as exc:
+            log.console_log('HTTP Error: {0}'.format(str(exc)))
+        except Exception as exc:
+            log.console_log('Unknow error: {0}'.format(str(exc)))
 
-        log.console_log("{}[*] Wapplyzing HTTPS on domain {}{}".format(G, domain, W) )
         try:
+            log.console_log("{}[*] Wapplyzing HTTPS on domain {}{}".format(G, domain, W) )
             targeturl = "https://" + domain
             wappalyzing.run_wappalyze(targeturl)
-        except:
-            log.console_log("{}[-] HTTPS connection was unavailable {}".format(R, W))
+        except urllib2.URLError as exc:
+            log.console_log('URL Error: {0}'.format(str(exc)))
+        except urllib2.HTTPError as exc:
+            log.console_log('HTTP Error: {0}'.format(str(exc)))
+        except Exception as exc:
+            log.console_log('Unknow error: {0}'.format(str(exc)))
 
     def service_scanning(self, ipaddress):
         scan_nm = ScanNmap()

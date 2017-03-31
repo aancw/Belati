@@ -17,6 +17,7 @@ Just for learning stuff and OSINT purpose. Correct me if i'm wrong
 - Fake and Random User Agent ( Prevent from blocking )
 - Proxy Support for Harvesting Emails and Documents
 - Public Git Finder in domain/subdomain
+- Robot.txt Scraper in domain/subdomain
 
 ## TODO
 - Automatic OSINT with Username and Email support
