@@ -20,36 +20,24 @@
 
 # This file is part of Belati project
 
+import sys
 from lib.pywhois import whois
 from logger import Logger
-import urllib2
-import sys
-from user_agents import UserAgents
+from url_request import URLRequest
 
+url_req = URLRequest()
 log = Logger()
-ua = UserAgents()
 
 class CheckDomain(object):
-	def domain_checker(self, domain_name):
-		req = urllib2.Request(domain_name)
-		try:
-			urllib2.urlopen(req)
+	def domain_checker(self, domain_name, proxy_address):
+		data = url_req.just_url_open(domain_name, proxy_address)
+		if data is not "":
 			log.console_log("OK!")
-		except urllib2.URLError, e:
-			if str(e.reason) == "[Errno -2] Name or service not known":
-				log.console_log("Not EXIST!")
-				log.console_log("Check your internet connection or check your target domain")
-				sys.exit()
-			else:
-				log.console_log("OK!")
 
-	def alive_check(self, domain_name):
-		request = urllib2.Request(domain_name, headers={'User-Agent' : ua.get_user_agent() })
-		try:
-			urllib2.urlopen(request)
+	def alive_check(self, domain_name, proxy_address):
+		data = url_req.just_url_open(domain_name, proxy_address)
+		if data is not "":
 			log.console_log("OK!")
-		except urllib2.HTTPError, e:
-			log.console_log("OK! - (" + str(e.getcode()) + ")")
 
 	def whois_domain(self, domain_name):
 		response = whois.whois(domain_name)

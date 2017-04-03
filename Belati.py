@@ -18,6 +18,13 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+# We need to check Dependency first
+from plugins.dep_check import DepCheck
+
+dep_check = DepCheck()
+dep_check.check_dependency()
+
 import argparse
 import urllib2
 import sys, signal, socket
@@ -32,6 +39,9 @@ from plugins.harvest_public_document import HarvestPublicDocument
 from plugins.scan_nmap import ScanNmap
 from plugins.wappalyzer import Wappalyzer
 from plugins.git_finder import GitFinder
+from plugins.robots_scraper import RobotsScraper
+from plugins.about_project import AboutProject
+from plugins.url_request import URLRequest
 from lib.Sublist3r import sublist3r
 from lib.CheckMyUsername.check_my_username import CheckMyUsername
 from dnsknife.scanner import Scanner
@@ -48,9 +58,12 @@ log = Logger()
 
 class Belati(object):
     def __init__(self):
+        self.about = AboutProject()
+        self.url_req = URLRequest()
+
         # Passing arguments
-        parser = argparse.ArgumentParser(description='=[ Belati v0.1.4-dev by Petruknisme] (https://github.com/aancw/Belati)')
-        parser.add_argument('-d', action='store', dest='domain' , help='Perform OSINT from Domain e.g petruknisme.com')
+        parser = argparse.ArgumentParser(description='=[ {} {} by {}] ({})'.format(self.about.__name__, self.about.__version__, self.about.__author__, self.about.__giturl__))
+        parser.add_argument('-d', action='store', dest='domain' , help='Perform OSINT from Domain e.g petruknisme.com(without protocol http/https)')
         parser.add_argument('-u', action='store', dest='username' , help='Perform OSINT from username e.g petruknisme')
         parser.add_argument('-e', action='store', dest='email' , help='Perform OSINT from email address')
         parser.add_argument('-c', action='store', dest='orgcomp' , help='Perform OSINT from Organization or Company Name')
@@ -59,7 +72,7 @@ class Belati(object):
         parser.add_argument('--single-proxy', action='store', dest='single_proxy', help='Proxy support with single IP (ex: http://127.0.0.1:8080)' )
         parser.add_argument('--proxy-file', action='store', dest='proxy_file_location', help='Proxy support from Proxy List File')
         parser.add_argument('--auto-proxy', action='store_true', dest='auto_proxy', default=True, help='Auto Proxy Support( Coming soon )' )
-        parser.add_argument('--version', action='version', version='=[ Belati v0.1.4-dev by Petruknisme] (https://github.com/aancw/Belati)')
+        parser.add_argument('--version', action='version', version='=[ {} {} by {}] ({})'.format(self.about.__name__, self.about.__version__, self.about.__author__, self.about.__giturl__))
         results = parser.parse_args()
 
         domain = results.domain
@@ -89,16 +102,19 @@ class Belati(object):
                 proxy = self.multiple_proxy_list
 
             extract_domain = tldextract.extract(domain)
-            self.check_domain("http://" + domain)
-            self.banner_grab("http://" + domain)
+            self.check_domain(self.url_req.ssl_checker(domain), proxy)
+            self.banner_grab(self.url_req.ssl_checker(domain), proxy)
+
 
             if extract_domain.subdomain == "":
+                self.robots_scraper(self.url_req.ssl_checker(domain), proxy)
                 self.enumerate_subdomains(domain, proxy)
                 self.scan_DNS_zone(domain)
                 self.harvest_email_search(domain, proxy)
                 self.harvest_email_pgp(domain, proxy)
             else:
                 domain = extract_domain.domain + '.' + extract_domain.suffix
+                self.robots_scraper(self.url_req.ssl_checker(domain), proxy)
                 self.enumerate_subdomains(domain, proxy)
                 self.scan_DNS_zone(domain)
                 self.harvest_email_search(domain, proxy)
@@ -127,10 +143,10 @@ class Belati(object):
         |_______/ |________/|________/|__/  |__/   |__/   |______/
 
 
-        =[ Belati v0.1.4-dev by Petruknisme]=
+        =[ {} {} by {}]=
 
-        + -- --=[ Collecting Public Data & Public Document for OSINT purpose ]=-- -- +
-        + -- --=[ https://petruknisme.com ]=-- -- +
+        + -- --=[ {} ]=-- -- +
+        + -- --=[ {} ]=-- -- +
         {}
         """
 
@@ -144,23 +160,23 @@ class Belati(object):
         {}
         """
 
-        log.console_log(banner.format(G, W))
+        log.console_log(banner.format(G, self.about.__name__, self.about.__version__, self.about.__author__, self.about.__info__, self.about.__authorurl__, W))
         log.console_log(warning_message.format(R, W))
 
-    def check_domain(self, domain_name):
+    def check_domain(self, domain_name, proxy_address):
         check = CheckDomain()
 
         log.console_log(G + "{}[*] Checking Domain Availability.... {}".format(G, W) , 0)
-        check.domain_checker(domain_name)
+        check.domain_checker(domain_name, proxy_address)
         log.console_log("{}[*] Checking URL Alive... {}".format(G, W), 0)
-        check.alive_check(domain_name)
+        check.alive_check(domain_name, proxy_address)
         log.console_log("{}[*] Perfoming Whois... {}".format(G, W))
         check.whois_domain(domain_name)
 
-    def banner_grab(self, domain_name):
+    def banner_grab(self, domain_name, proxy_address):
         banner = BannerGrab()
         log.console_log("{}[*] Perfoming HTTP Banner Grabbing... {}".format(G, W))
-        banner.show_banner(domain_name)
+        banner.show_banner(domain_name, proxy_address)
 
     def enumerate_subdomains(self, domain_name, proxy):
         log.console_log("{}[*] Perfoming Subdomains Enumeration... {}".format(G, W))
@@ -168,7 +184,8 @@ class Belati(object):
         subdomain_ip_list = []
 
         for subdomain in subdomain_list:
-            self.banner_grab("http://" + subdomain)
+            self.banner_grab(self.url_req.ssl_checker(subdomain), proxy)
+            self.robots_scraper(self.url_req.ssl_checker(subdomain), proxy)
             self.wapplyzing_webpage(subdomain)
             self.public_git_finder(subdomain, proxy)
             try:
@@ -182,21 +199,10 @@ class Belati(object):
             self.service_scanning(ipaddress)
 
     def wapplyzing_webpage(self, domain):
+        log.console_log("{}[*] Wapplyzing on domain {}{}".format(G, domain, W))
         wappalyzing = Wappalyzer()
+        targeturl = self.url_req.ssl_checker(domain)
         try:
-            log.console_log("{}[*] Wapplyzing HTTP on domain {}{}".format(G, domain, W))
-            targeturl = "http://" + domain
-            wappalyzing.run_wappalyze(targeturl)
-        except urllib2.URLError as exc:
-            log.console_log('URL Error: {0}'.format(str(exc)))
-        except urllib2.HTTPError as exc:
-            log.console_log('HTTP Error: {0}'.format(str(exc)))
-        except Exception as exc:
-            log.console_log('Unknow error: {0}'.format(str(exc)))
-
-        try:
-            log.console_log("{}[*] Wapplyzing HTTPS on domain {}{}".format(G, domain, W) )
-            targeturl = "https://" + domain
             wappalyzing.run_wappalyze(targeturl)
         except urllib2.URLError as exc:
             log.console_log('URL Error: {0}'.format(str(exc)))
@@ -247,7 +253,6 @@ class Belati(object):
         except Exception, exc:
             log.console_log("{}[-] Not found or Unavailable. {}{}".format(R, str(harvest_result), W ))
 
-
     def harvest_document(self, domain_name, proxy_address):
         log.console_log("{}[*] Perfoming Public Document Harvest from Google... {}".format(G, W))
         public_doc = HarvestPublicDocument()
@@ -296,8 +301,13 @@ class Belati(object):
         git_finder = GitFinder()
         if git_finder.check_git(domain, proxy_address) == True:
             log.console_log("{}[+] Gotcha! You are in luck boy!{}".format(G, W))
-        else:
-            log.console_log("{}[-] Oh. Don't be sad :({}".format(Y, W))
+
+    def robots_scraper(self, domain, proxy_address):
+        scraper = RobotsScraper()
+        data = scraper.check_robots(domain, proxy_address)
+        if data is not None and data.code == 200:
+            log.console_log("{}[+] Found interesting robots.txt content on domain {}:{}".format(Y, domain, W))
+            log.console_log(data.read())
 
     def check_python_version(self):
         if sys.version[:3] == "2.7" or "2" in sys.version[:3]:

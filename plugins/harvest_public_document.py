@@ -21,13 +21,11 @@
 # This file is part of Belati project
 
 import re, os
-import urllib2, urllib
+import urllib
 from logger import Logger
 from tqdm import tqdm
 import requests
-from user_agents import UserAgents
-from urlparse import urlparse
-import random
+from url_request import URLRequest
 
 # Console color
 G = '\033[92m'  # green
@@ -36,8 +34,8 @@ B = '\033[94m'  # blue
 R = '\033[91m'  # red
 W = '\033[0m'   # white
 
+url_req = URLRequest()
 log = Logger()
-ua = UserAgents()
 
 class HarvestPublicDocument(object):
     def init_crawl(self, domain, proxy_address):
@@ -54,38 +52,18 @@ class HarvestPublicDocument(object):
     def harvest_public_doc(self, domain, extension, proxy_address):
         log.console_log("{}[*] Searching {} Document... {}".format(G, extension.upper(), W))
         total_files = 0
-        try:
-            if type(proxy_address) is list:
-                # Get random proxy from list
-                proxy_address_fix = random.choice(proxy_address)
-            else:
-                proxy_address_fix = proxy_address
-
-            if proxy_address is not "":
-                log.console_log("{}[*] Using Proxy Address : {}{}".format(Y, proxy_address_fix, W))
-
-            url = 'https://www.google.com/search?q=site:' + domain + '%20ext:' + extension + '&filter=0&num=200'
-            parse = urlparse(proxy_address_fix)
-            proxy_scheme = parse.scheme
-            proxy = str(parse.hostname) + ':' + str(parse.port)
-            proxy_handler = urllib2.ProxyHandler({ proxy_scheme: proxy})
-            opener = urllib2.build_opener(proxy_handler)
-            opener.addheaders = [('User-agent', ua.get_user_agent() )]
-            urllib2.install_opener(opener)
-            req = urllib2.Request(url)
-            data = urllib2.urlopen(req).read()
-            regex = "(?P<url>https?://[^:]+\.%s)" % extension
-            data = re.findall(regex, data)
-            list_files_download = list(set(data))
-            total_files = str(len(list_files_download))
-            log.console_log("{}[*] Found {} {} files!".format(G, total_files, extension.upper(), W) )
-            if total_files != "0":
-                log.console_log("{}[*] Please wait, lemme download it for you ;) [NO PROXY] {}".format(G, W))
-                for files_download in list_files_download:
-                    log.no_console_log(files_download.split('/')[-1])
-                    self.download_files(files_download, domain)
-        except urllib2.URLError, e:
-            log.console_log(e)
+        url = 'https://www.google.com/search?q=site:' + domain + '%20ext:' + extension + '&filter=0&num=200'
+        data = data = url_req.standart_request(url, proxy_address)
+        regex = "(?P<url>https?://[^:]+\.%s)" % extension
+        data = re.findall(regex, data)
+        list_files_download = list(set(data))
+        total_files = str(len(list_files_download))
+        log.console_log("{}[*] Found {} {} files!".format(G, total_files, extension.upper(), W) )
+        if total_files != "0":
+            log.console_log("{}[*] Please wait, lemme download it for you ;) {}[NO PROXY] {}".format(G, Y, W))
+            for files_download in list_files_download:
+                log.no_console_log(files_download.split('/')[-1])
+                self.download_files(files_download, domain)
 
     def download_files(self, url, folder_domain):
         filename = url.split('/')[-1]

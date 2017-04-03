@@ -20,18 +20,15 @@
 
 # This file is part of Belati project
 
-import sys
-from logger import Logger
-from url_request import URLRequest
-
-url_req = URLRequest()
-log = Logger()
-
-class BannerGrab(object):
-    def show_banner(self, domain_name, proxy_address):
-        data = url_req.header_info(domain_name, proxy_address)
-        log.console_log(data)
+class AboutProject(object):
+    def __init__(self):
+        self.__info__ = 'Collecting Public Data & Public Document for OSINT purpose'
+        self.__author__ = 'Petruknisme'
+        self.__version__ = 'v0.1.7-dev'
+        self.__name__= "Belati"
+        self.__giturl__ = "https://github.com/aancw/Belati"
+        self.__authorurl__ = "https://petruknisme.com"
 
 if __name__ == '__main__':
-    BannerGrabApp = BannerGrab()
-    BannerGrabApp
+    AboutProjectApp = AboutProject()
+    AboutProjectApp

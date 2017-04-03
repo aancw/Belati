@@ -21,11 +21,7 @@
 # This file is part of Belati project
 
 import sys, re, time
-import urllib2
-from logger import Logger
-from user_agents import UserAgents
-from urlparse import urlparse
-import random
+from url_request import URLRequest
 
 # Console color
 G = '\033[92m'  # green
@@ -34,39 +30,15 @@ B = '\033[94m'  # blue
 R = '\033[91m'  # red
 W = '\033[0m'   # white
 
-log = Logger()
-ua = UserAgents()
+url_req = URLRequest()
 
 class GitFinder(object):
     def check_git(self, domain, proxy_address):
-        if type(proxy_address) is list:
-            # Get random proxy from list
-            proxy_address_fix = random.choice(proxy_address)
-        else:
-            proxy_address_fix = proxy_address
+        data = url_req.just_url_open("https://" + domain + "/.git/HEAD", proxy_address)
+        if data is not None:
+            decode_data = data.read(200).decode()
 
-        if proxy_address is not "":
-            log.console_log("{}[*] Using Proxy Address : {}{}".format(Y, proxy_address_fix, W))
-
-        url = "http://" + domain + "/.git/HEAD"
-        try:
-            parse = urlparse(proxy_address_fix)
-            proxy_scheme = parse.scheme
-            proxy = str(parse.hostname) + ':' + str(parse.port)
-            proxy_handler = urllib2.ProxyHandler({ proxy_scheme: proxy})
-            opener = urllib2.build_opener(proxy_handler)
-            opener.addheaders = [('User-agent', ua.get_user_agent() )]
-            urllib2.install_opener(opener)
-            req = urllib2.Request(url)
-            data = urllib2.urlopen(req).read(200).decode()
-
-            if not 'refs/heads' in data:
+            if not 'refs/heads' in decode_data:
                 return False
             else:
                 return True
-
-        except urllib2.HTTPError, e:
-            print('Error code: {}'.format( str(e.code)))
-            return e.code
-        except Exception, detail:
-            print('ERROR {}'.format(str(detail)))

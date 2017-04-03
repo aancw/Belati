@@ -24,81 +24,29 @@
 # Thanks to pantuts and maldevel
 
 import sys, re, time
-import urllib2
-from logger import Logger
-from user_agents import UserAgents
-from urlparse import urlparse
-import random
+from url_request import URLRequest
 
-# Console color
-G = '\033[92m'  # green
-Y = '\033[93m'  # yellow
-B = '\033[94m'  # blue
-R = '\033[91m'  # red
-W = '\033[0m'   # white
-
-log = Logger()
-ua = UserAgents()
+url_req = URLRequest()
 
 class HarvestEmail(object):
     def crawl_search(self, domain, proxy_address):
-        try:
-            if type(proxy_address) is list:
-                # Get random proxy from list
-                proxy_address_fix = random.choice(proxy_address)
-            else:
-                proxy_address_fix = proxy_address
-
-            if proxy_address is not "":
-                log.console_log("{}[*] Using Proxy Address : {}{}".format(Y, proxy_address_fix, W))
-
-            url = 'https://www.google.com/search?num=200&start=0&filter=0&hl=en&q=@' + domain
-            parse = urlparse(proxy_address_fix)
-            proxy_scheme = parse.scheme
-            proxy = str(parse.hostname) + ':' + str(parse.port)
-            proxy_handler = urllib2.ProxyHandler({ proxy_scheme: proxy})
-            opener = urllib2.build_opener(proxy_handler)
-            opener.addheaders = [('User-agent', ua.get_user_agent() )]
-            urllib2.install_opener(opener)
-            req = urllib2.Request(url)
-            data = urllib2.urlopen(req).read()
-            dataStrip = re.sub('<[^<]+?>', '', data) # strip all html tags like <em>
-            dataStrip1 =  re.findall(r'[a-zA-Z0-9._+-]+@[a-zA-Z0-9._+-]+' + domain, dataStrip)
-            dataStrip2 = re.findall(r'[a-zA-Z0-9._+-]+@' + domain, dataStrip)
-            dataEmail = set(dataStrip1 + dataStrip2)
-            dataFix = [x for x in dataEmail if not x.startswith('x22') and not x.startswith('3D') and not x.startswith('x3d')] # ignore email because bad parsing
-            return list(dataFix)
-        except urllib2.URLError, e:
-            return e
+        url = 'https://www.google.com/search?num=200&start=0&filter=0&hl=en&q=@' + domain
+        data = url_req.standart_request(url, proxy_address)
+        dataStrip = re.sub('<[^<]+?>', '', data) # strip all html tags like <em>
+        dataStrip1 =  re.findall(r'[a-zA-Z0-9._+-]+@[a-zA-Z0-9._+-]+' + domain, dataStrip)
+        dataStrip2 = re.findall(r'[a-zA-Z0-9._+-]+@' + domain, dataStrip)
+        dataEmail = set(dataStrip1 + dataStrip2)
+        dataFix = [x for x in dataEmail if not x.startswith('x22') and not x.startswith('3D') and not x.startswith('x3d')] # ignore email because bad parsing
+        return list(dataFix)
 
     def crawl_pgp_mit_edu(self, domain, proxy_address):
-        try:
-            if type(proxy_address) is list:
-                # Get random proxy from list
-                proxy_address_fix = random.choice(proxy_address)
-            else:
-                proxy_address_fix = proxy_address
-
-            if proxy_address is not "":
-                log.console_log("{}[*] Using Proxy Address : {}{}".format(Y, proxy_address_fix, W))
-
-            url = 'http://pgp.mit.edu:11371/pks/lookup?op=index&search=' + domain
-            parse = urlparse(proxy_address_fix)
-            proxy_scheme = parse.scheme
-            proxy = str(parse.hostname) + ':' + str(parse.port)
-            proxy_handler = urllib2.ProxyHandler({ proxy_scheme: proxy})
-            opener = urllib2.build_opener(proxy_handler)
-            opener.addheaders = [('User-agent', 'Googlebot/3.1 (+http://www.googlebot.com/bot.html)' )]
-            urllib2.install_opener(opener)
-            req = urllib2.Request(url)
-            data = urllib2.urlopen(req).read()
-            dataStrip = re.sub('<[^<]+?>', '', data) # strip all html tags like <em>
-            dataStrip1 =  re.findall(r'[a-zA-Z0-9._+-]+@[a-zA-Z0-9._+-]+' + domain, dataStrip)
-            dataStrip2 = re.findall(r'[a-zA-Z0-9._+-]+@' + domain, dataStrip)
-            dataEmail = set(dataStrip1 + dataStrip2)
-            return list(dataEmail)
-        except urllib2.URLError, e:
-            return e
+        url = 'http://pgp.mit.edu:11371/pks/lookup?op=index&search=' + domain
+        data = url_req.standart_request(url, proxy_address, 'Googlebot/3.1 (+http://www.googlebot.com/bot.html)')
+        dataStrip = re.sub('<[^<]+?>', '', data) # strip all html tags like <em>
+        dataStrip1 =  re.findall(r'[a-zA-Z0-9._+-]+@[a-zA-Z0-9._+-]+' + domain, dataStrip)
+        dataStrip2 = re.findall(r'[a-zA-Z0-9._+-]+@' + domain, dataStrip)
+        dataEmail = set(dataStrip1 + dataStrip2)
+        return list(dataEmail)
 
 if __name__ == '__main__':
     HarvestEmailApp = HarvestEmail()

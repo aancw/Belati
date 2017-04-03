@@ -20,18 +20,12 @@
 
 # This file is part of Belati project
 
-import sys
-from logger import Logger
 from url_request import URLRequest
 
 url_req = URLRequest()
-log = Logger()
 
-class BannerGrab(object):
-    def show_banner(self, domain_name, proxy_address):
-        data = url_req.header_info(domain_name, proxy_address)
-        log.console_log(data)
-
-if __name__ == '__main__':
-    BannerGrabApp = BannerGrab()
-    BannerGrabApp
+class RobotsScraper(object):
+    def check_robots(self, domain_name, proxy_address):
+        url_request = "{}/robots.txt".format(domain_name, proxy_address)
+        data = url_req.just_url_open(url_request, proxy_address)
+        return data

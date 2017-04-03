@@ -1,4 +1,3 @@
-urllib2
 dnspython
 requests
 argparse
@@ -12,4 +11,4 @@ validators
 tqdm
 tldextract
 fake-useragent
-python-Wappalyzer
+python-wappalyzer
