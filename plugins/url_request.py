@@ -20,6 +20,7 @@
 
 # This file is part of Belati project
 
+import sys
 import urllib2
 from user_agents import UserAgents
 from urlparse import urlparse
