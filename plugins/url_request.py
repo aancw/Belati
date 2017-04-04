@@ -135,6 +135,7 @@ class URLRequest(object):
             pass
         except urllib2.URLError, e:
             pass
+
         if use_ssl == False:
             return "http://{}".format(domain)
         else:

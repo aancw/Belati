@@ -12,3 +12,4 @@ tqdm
 tldextract
 fake-useragent
 python-wappalyzer
+future

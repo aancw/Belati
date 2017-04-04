@@ -72,6 +72,14 @@ Don't worry. Belati still running when you are run with normal user ;)
 - tldextract
 - fake-useragent
 
+## System Dependencies
+
+For CentOS/Fedora user, please install this:
+
+```
+yum install gcc gmp gmp-devel python-devel
+```
+
 ## Library
 - python-whois
 - Sublist3r
