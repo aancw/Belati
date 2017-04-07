@@ -148,5 +148,4 @@ class URLRequest(object):
         else:
             domain_fix = "https://{}".format(domain)
 
-        print("domain yang digunakan " + domain_fix)
         return domain_fix
