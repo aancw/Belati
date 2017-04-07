@@ -29,8 +29,11 @@ log = Logger()
 
 class BannerGrab(object):
     def show_banner(self, domain_name, proxy_address):
-        data = url_req.header_info(domain_name, proxy_address)
-        log.console_log(data)
+        try:
+            data = url_req.header_info(domain_name, proxy_address)
+            log.console_log(data)
+        except:
+            pass
 
 if __name__ == '__main__':
     BannerGrabApp = BannerGrab()

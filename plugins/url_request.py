@@ -21,6 +21,7 @@
 # This file is part of Belati project
 
 import sys
+import ssl
 import urllib2
 from user_agents import UserAgents
 from urlparse import urlparse
@@ -124,20 +125,28 @@ class URLRequest(object):
 			if str(e.reason) == "[Errno -2] Name or service not known":
 				log.console_log("Not EXIST!")
 				log.console_log("Check your internet connection or check your target domain")
-				sys.exit()
+				return "notexist"
 
     def ssl_checker(self, domain):
         use_ssl = False
+        domain_fix = ""
 
         try:
-            urllib2.urlopen("https://{}".format(domain), timeout=2)
-            use_ssl = True
+            # Skip SSL Verification Check!
+            # https://stackoverflow.com/questions/27835619/ssl-certificate-verify-failed-error
+            gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)  # Only for gangstars
+            data = urllib2.urlopen("https://{}".format(domain), timeout=15, context=gcontext)
+            if not "ERROR" in data:
+                use_ssl = True
         except urllib2.HTTPError, e:
             pass
         except urllib2.URLError, e:
             pass
 
         if use_ssl == False:
-            return "http://{}".format(domain)
+            domain_fix = "http://{}".format(domain)
         else:
-            return "https://{}".format(domain)
+            domain_fix = "https://{}".format(domain)
+
+        print("domain yang digunakan " + domain_fix)
+        return domain_fix

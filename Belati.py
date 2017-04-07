@@ -186,7 +186,7 @@ class Belati(object):
         for subdomain in subdomain_list:
             self.banner_grab(self.url_req.ssl_checker(subdomain), proxy)
             self.robots_scraper(self.url_req.ssl_checker(subdomain), proxy)
-            self.wapplyzing_webpage(subdomain)
+            self.wappalyzing_webpage(subdomain)
             self.public_git_finder(subdomain, proxy)
             try:
                 subdomain_ip_list.append(socket.gethostbyname(subdomain))
@@ -198,7 +198,7 @@ class Belati(object):
         for ipaddress in subdomain_ip_listFix:
             self.service_scanning(ipaddress)
 
-    def wapplyzing_webpage(self, domain):
+    def wappalyzing_webpage(self, domain):
         log.console_log("{}[*] Wapplyzing on domain {}{}".format(G, domain, W))
         wappalyzing = Wappalyzer()
         targeturl = self.url_req.ssl_checker(domain)

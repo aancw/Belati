@@ -30,14 +30,20 @@ log = Logger()
 
 class CheckDomain(object):
 	def domain_checker(self, domain_name, proxy_address):
-		data = url_req.just_url_open(domain_name, proxy_address)
-		if data is not "":
-			log.console_log("OK!")
+		try:
+			data = url_req.just_url_open(domain_name, proxy_address)
+			if data is not "" and data is not "notexist" and not "ERROR" in data:
+				log.console_log("OK!")
+		except:
+			log.console_log("NOT OK!")
 
 	def alive_check(self, domain_name, proxy_address):
-		data = url_req.just_url_open(domain_name, proxy_address)
-		if data is not "":
-			log.console_log("OK!")
+		try:
+			data = url_req.just_url_open(domain_name, proxy_address)
+			if data is not "" and data is not "notexist" and not "ERROR" in data:
+				log.console_log("OK!")
+		except:
+			log.console_log("NOT OK! ")
 
 	def whois_domain(self, domain_name):
 		response = whois.whois(domain_name)

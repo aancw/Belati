@@ -31,22 +31,28 @@ url_req = URLRequest()
 class HarvestEmail(object):
     def crawl_search(self, domain, proxy_address):
         url = 'https://www.google.com/search?num=200&start=0&filter=0&hl=en&q=@' + domain
-        data = url_req.standart_request(url, proxy_address)
-        dataStrip = re.sub('<[^<]+?>', '', data) # strip all html tags like <em>
-        dataStrip1 =  re.findall(r'[a-zA-Z0-9._+-]+@[a-zA-Z0-9._+-]+' + domain, dataStrip)
-        dataStrip2 = re.findall(r'[a-zA-Z0-9._+-]+@' + domain, dataStrip)
-        dataEmail = set(dataStrip1 + dataStrip2)
-        dataFix = [x for x in dataEmail if not x.startswith('x22') and not x.startswith('3D') and not x.startswith('x3d')] # ignore email because bad parsing
-        return list(dataFix)
+        try:
+            data = url_req.standart_request(url, proxy_address)
+            dataStrip = re.sub('<[^<]+?>', '', data) # strip all html tags like <em>
+            dataStrip1 =  re.findall(r'[a-zA-Z0-9._+-]+@[a-zA-Z0-9._+-]+' + domain, dataStrip)
+            dataStrip2 = re.findall(r'[a-zA-Z0-9._+-]+@' + domain, dataStrip)
+            dataEmail = set(dataStrip1 + dataStrip2)
+            dataFix = [x for x in dataEmail if not x.startswith('x22') and not x.startswith('3D') and not x.startswith('x3d')] # ignore email because bad parsing
+            return list(dataFix)
+        except:
+            pass
 
     def crawl_pgp_mit_edu(self, domain, proxy_address):
         url = 'http://pgp.mit.edu:11371/pks/lookup?op=index&search=' + domain
-        data = url_req.standart_request(url, proxy_address, 'Googlebot/3.1 (+http://www.googlebot.com/bot.html)')
-        dataStrip = re.sub('<[^<]+?>', '', data) # strip all html tags like <em>
-        dataStrip1 =  re.findall(r'[a-zA-Z0-9._+-]+@[a-zA-Z0-9._+-]+' + domain, dataStrip)
-        dataStrip2 = re.findall(r'[a-zA-Z0-9._+-]+@' + domain, dataStrip)
-        dataEmail = set(dataStrip1 + dataStrip2)
-        return list(dataEmail)
+        try:
+            data = url_req.standart_request(url, proxy_address, 'Googlebot/3.1 (+http://www.googlebot.com/bot.html)')
+            dataStrip = re.sub('<[^<]+?>', '', data) # strip all html tags like <em>
+            dataStrip1 =  re.findall(r'[a-zA-Z0-9._+-]+@[a-zA-Z0-9._+-]+' + domain, dataStrip)
+            dataStrip2 = re.findall(r'[a-zA-Z0-9._+-]+@' + domain, dataStrip)
+            dataEmail = set(dataStrip1 + dataStrip2)
+            return list(dataEmail)
+        except:
+            pass
 
 if __name__ == '__main__':
     HarvestEmailApp = HarvestEmail()

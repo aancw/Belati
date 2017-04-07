@@ -24,7 +24,7 @@ class AboutProject(object):
     def __init__(self):
         self.__info__ = 'Collecting Public Data & Public Document for OSINT purpose'
         self.__author__ = 'Petruknisme'
-        self.__version__ = 'v0.1.7-dev'
+        self.__version__ = 'v0.1.8-dev'
         self.__name__= "Belati"
         self.__giturl__ = "https://github.com/aancw/Belati"
         self.__authorurl__ = "https://petruknisme.com"

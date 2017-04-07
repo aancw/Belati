@@ -26,6 +26,10 @@ url_req = URLRequest()
 
 class RobotsScraper(object):
     def check_robots(self, domain_name, proxy_address):
-        url_request = "{}/robots.txt".format(domain_name, proxy_address)
-        data = url_req.just_url_open(url_request, proxy_address)
-        return data
+        try:
+            url_request = "{}/robots.txt".format(domain_name, proxy_address)
+            data = url_req.just_url_open(url_request, proxy_address)
+            if data is not "" and data is not "notexist":
+                return data
+        except:
+            pass

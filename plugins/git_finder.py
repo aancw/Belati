@@ -34,11 +34,14 @@ url_req = URLRequest()
 
 class GitFinder(object):
     def check_git(self, domain, proxy_address):
-        data = url_req.just_url_open("https://" + domain + "/.git/HEAD", proxy_address)
-        if data is not None:
-            decode_data = data.read(200).decode()
+        try:
+            data = url_req.just_url_open(url_req.ssl_checker(domain) + "/.git/HEAD", proxy_address)
+            if data is not None and data is not "notexist":
+                decode_data = data.read(200).decode()
 
-            if not 'refs/heads' in decode_data:
-                return False
-            else:
-                return True
+                if not 'refs/heads' in decode_data:
+                    return False
+                else:
+                    return True
+        except:
+            pass

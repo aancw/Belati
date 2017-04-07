@@ -76,7 +76,10 @@ class HarvestPublicDocument(object):
                     raise
 
         with tqdm(unit='B', unit_scale=True, miniters=1,desc=filename) as t:
-            urllib.urlretrieve(url, filename=full_filename,reporthook=self.my_hook(t), data=None)
+            try:
+                urllib.urlretrieve(url, filename=full_filename,reporthook=self.my_hook(t), data=None)
+            except:
+                pass
 
     def my_hook(self,t):
       """
