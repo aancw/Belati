@@ -20,17 +20,27 @@
 
 # This file is part of Belati project
 
+import sys, re, time
 from url_request import URLRequest
+
+# Console color
+G = '\033[92m'  # green
+Y = '\033[93m'  # yellow
+B = '\033[94m'  # blue
+R = '\033[91m'  # red
+W = '\033[0m'   # white
 
 url_req = URLRequest()
 
-class RobotsScraper(object):
-    def check_robots(self, domain_name, proxy_address):
+class SVNFinder(object):
+    def check_svn(self, domain, proxy_address):
         try:
-            url_request = "{}/robots.txt".format(domain_name, proxy_address)
-            data = url_req.just_url_open(url_request, proxy_address)
-            if data is not "" and data is not "notexist":
-                if data.getcode() == 200 and data.getcode() != 302:
+            data = url_req.just_url_open(url_req.ssl_checker(domain) + "/.svn/", proxy_address)
+
+            if data is not None and data is not "notexist":
+                if data == 403:
                     return data
+                if data.getcode() == 200 and data.getcode() != 302:
+                    return data.getcode()
         except:
             pass

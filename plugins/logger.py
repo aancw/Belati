@@ -20,7 +20,7 @@
 
 # This file is part of Belati project
 
-import sys, os
+import sys, os, errno
 import logging
 import time
 

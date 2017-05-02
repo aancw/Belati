@@ -119,8 +119,10 @@ class URLRequest(object):
             opener.addheaders = [('User-agent', ua.get_user_agent() )]
             urllib2.install_opener(opener)
             req = urllib2.Request(url_request)
-            data = urllib2.urlopen(req)
+            data = urllib2.urlopen(req, timeout=25)
             return data
+        except urllib2.HTTPError, e:
+                return e.code
     	except urllib2.URLError, e:
 			if str(e.reason) == "[Errno -2] Name or service not known":
 				log.console_log("Not EXIST!")
@@ -135,7 +137,7 @@ class URLRequest(object):
             # Skip SSL Verification Check!
             # https://stackoverflow.com/questions/27835619/ssl-certificate-verify-failed-error
             gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)  # Only for gangstars
-            data = urllib2.urlopen("https://{}".format(domain), timeout=15, context=gcontext)
+            data = urllib2.urlopen("https://{}".format(domain), timeout=25, context=gcontext)
             if not "ERROR" in data:
                 use_ssl = True
         except urllib2.HTTPError, e:

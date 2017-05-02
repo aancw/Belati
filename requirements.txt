@@ -13,3 +13,4 @@ tldextract
 fake-useragent
 python-wappalyzer
 future
+beautifulsoup4

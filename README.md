@@ -1,4 +1,6 @@
 # Belati
+Belati - The Traditional Swiss Army Knife For OSINT
+
 Belati is tool for Collecting Public Data & Public Document from Website and other service for OSINT purpose. This tools is inspired by Foca and Datasploit for OSINT :)
 
 ## Why I Made this?
@@ -17,7 +19,10 @@ Just for learning stuff and OSINT purpose. Correct me if i'm wrong
 - Fake and Random User Agent ( Prevent from blocking )
 - Proxy Support for Harvesting Emails and Documents
 - Public Git Finder in domain/subdomain
+- Public SVN Finder in domain/subdomain
 - Robot.txt Scraper in domain/subdomain
+- Gather Public Company Employee
+
 
 ## TODO
 - Automatic OSINT with Username and Email support
@@ -32,6 +37,7 @@ Just for learning stuff and OSINT purpose. Correct me if i'm wrong
 - Web version with Django
 - Scanning Report export to PDF
 - domain or subdomain reputation checker
+- Reporting Support to JSON, PDF 
 
 ## Install/Usage
 ```
@@ -85,12 +91,20 @@ yum install gcc gmp gmp-devel python-devel
 - Sublist3r
 - Subbrute
 - nmap
+- git
 
 ## Notice
 I'm using PyWhois Library, Sublist3r, MailHarvester, Emingoo as part of my code. This tool is for educational purposes only. Any damage you make will not affect the author. Do It With Your Own Risk
 
 ## Author
 Aan Wahyu a.k.a Petruknisme(https://petruknisme.com)
+
+## Thanks To
+
+Thanks to PyWhois Library, Sublist3r, MailHarvester, Emingoo for being part of my code. Also thanks to Hispagatos, Infosec-ninjas, eCHo, RNDC( Research and development center ) and all other people who are inspiring this project :)
+
+Thanks to Echo-Zine Staff for approving my Ezine : http://ezine.echo.or.id/issue31/005.txt - Belati : Collecting Public Data & Public Document for OSINT Purpose - Petruknisme
+
 
 ## License
 Belati is licensed under GPL V2. You can use, modify, or redistribute this tool under the terms of GNU General Public License (GPLv2).

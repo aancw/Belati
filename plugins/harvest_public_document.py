@@ -20,7 +20,7 @@
 
 # This file is part of Belati project
 
-import re, os
+import re, os, errno
 import urllib
 from logger import Logger
 from tqdm import tqdm
@@ -54,7 +54,10 @@ class HarvestPublicDocument(object):
         total_files = 0
         url = 'https://www.google.com/search?q=site:' + domain + '%20ext:' + extension + '&filter=0&num=200'
         data = data = url_req.standart_request(url, proxy_address)
-        regex = "(?P<url>https?://[^:]+\.%s)" % extension
+        # Re<url>https?:\/\/[A-Za-z0-9\-\?&#_~@=\.\/%\[\]\+]+.pdf
+        # (?P<url>https?://[A-Za-z0-9\-\?&#_~@=\.\/%\[\]\+]+\.pdf)
+        #  "(?P<url>https?://[^:]+\.%s)" % extension
+        regex = "(?P<url>https?://[A-Za-z0-9\-\?&#_~@=\.\/%\[\]\+]+\.{})".format(extension)
         data = re.findall(regex, data)
         list_files_download = list(set(data))
         total_files = str(len(list_files_download))
