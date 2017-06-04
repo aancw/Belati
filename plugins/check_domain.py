@@ -48,6 +48,7 @@ class CheckDomain(object):
 	def whois_domain(self, domain_name):
 		response = whois.whois(domain_name)
 		log.console_log(response)
+		return response
 
 if __name__ == '__main__':
     CheckDomainApp = CheckDomain()

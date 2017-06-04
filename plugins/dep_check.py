@@ -36,7 +36,7 @@ try:
     # Check if pip module is installed
     import pip
 except ImportError:
-    log.console_log("{}[-] Sorry, please install pip before using Belati : http://www.pip-installer.org/en/latest/installing.html {}".format(R, W))
+    log.console_log("{}[-] Sorry, please install pip before using Belati : https://pip.pypa.io/en/stable/installing/ {}".format(R, W))
     sys.exit(1)
 
 try:

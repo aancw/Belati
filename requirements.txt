@@ -14,3 +14,5 @@ fake-useragent
 python-wappalyzer
 future
 beautifulsoup4
+python-whois
+futures

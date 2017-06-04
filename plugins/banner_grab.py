@@ -32,6 +32,7 @@ class BannerGrab(object):
         try:
             data = url_req.header_info(domain_name, proxy_address)
             log.console_log(data)
+            return data
         except:
             pass
 

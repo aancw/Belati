@@ -22,6 +22,7 @@
 
 import re, os, errno
 import urllib
+from database import Database
 from logger import Logger
 from tqdm import tqdm
 import requests
@@ -38,7 +39,12 @@ url_req = URLRequest()
 log = Logger()
 
 class HarvestPublicDocument(object):
-    def init_crawl(self, domain, proxy_address):
+    def __init__(self):
+        self.db = Database()
+        self.project_id = 0
+
+    def init_crawl(self, domain, proxy_address, project_id):
+        self.project_id = project_id
         log.console_log("{}[*] Gather Link from Google Search for domain {}{}".format(G, domain, W))
         self.harvest_public_doc(domain, "pdf", proxy_address)
         self.harvest_public_doc(domain, "doc", proxy_address)
@@ -71,6 +77,7 @@ class HarvestPublicDocument(object):
     def download_files(self, url, folder_domain):
         filename = url.split('/')[-1]
         full_filename = 'belatiFiles/{}/{}'.format(folder_domain, filename)
+        self.db.insert_public_doc(self.project_id, str(os.path.splitext(filename)[1]), str(url), str(full_filename))
         if not os.path.exists(os.path.dirname(full_filename)):
             try:
                 os.makedirs(os.path.dirname(full_filename))

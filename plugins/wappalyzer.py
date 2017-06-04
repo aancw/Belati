@@ -38,6 +38,8 @@ class Wappalyzer(object):
         else:
             log.console_log("Result Not Found")
 
+        return str(analyze_result)
+
 if __name__ == '__main__':
     wappalyzerApp = wappalyzer()
     wappalyzerApp

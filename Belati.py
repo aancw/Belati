@@ -26,8 +26,9 @@ dep_check = DepCheck()
 dep_check.check_dependency()
 
 import argparse
+import datetime
 import urllib2
-import sys, signal, socket
+import sys, signal, socket, re
 import time
 import dns.resolver
 import tldextract
@@ -35,7 +36,9 @@ import tldextract
 from plugins.about_project import AboutProject
 from plugins.banner_grab import BannerGrab
 from plugins.check_domain import CheckDomain
+from plugins.config import Config
 from plugins.common_service_check import CommonServiceCheck
+from plugins.database import Database
 from plugins.gather_company import GatherCompany
 from plugins.git_finder import GitFinder
 from plugins.harvest_email import HarvestEmail
@@ -91,8 +94,19 @@ class Belati(object):
 
         self.show_banner()
 
-        if domain is not None:
+        conf = Config()
+        self.db = Database()
 
+        # Setup project
+        self.project_id = self.db.create_new_project(domain, orgcomp, datetime.datetime.now())
+        log.console_log("{}[+] Creating New Belati Project... {}".format(G, W))
+        log.console_log("---------------------------------------------------------")
+        log.console_log("Project ID: {}".format(str(self.project_id)))
+        log.console_log("Project Domain: {}".format(domain))
+        log.console_log("Project Organization/Company: {}".format(orgcomp))
+        log.console_log("---------------------------------------------------------")
+
+        if domain is not None:
             if single_proxy is not None:
                 log.console_log("{}[*] Checking Proxy Status... {}".format(G, W))
                 if self.check_single_proxy_status(single_proxy, "http://" + str(domain)) == 'ok':
@@ -175,17 +189,21 @@ class Belati(object):
     def check_domain(self, domain_name, proxy_address):
         check = CheckDomain()
 
-        log.console_log(G + "{}[*] Checking Domain Availability.... {}".format(G, W) , 0)
+        log.console_log(G + "{}[*] Checking Domain Availability... {}".format(G, W) , 0)
         check.domain_checker(domain_name, proxy_address)
         log.console_log("{}[*] Checking URL Alive... {}".format(G, W), 0)
         check.alive_check(domain_name, proxy_address)
         log.console_log("{}[*] Perfoming Whois... {}".format(G, W))
-        check.whois_domain(domain_name)
+        whois_result = check.whois_domain(domain_name)
+        email = re.findall(r'[a-zA-Z0-9._+-]+@[a-zA-Z0-9._+-]+\s*', str(whois_result))
+        self.db.insert_domain_result(self.project_id, self.strip_scheme(domain_name), str(whois_result), str(email) )
+
 
     def banner_grab(self, domain_name, proxy_address):
         banner = BannerGrab()
         log.console_log("{}[*] Perfoming HTTP Banner Grabbing... {}".format(G, W))
-        banner.show_banner(domain_name, proxy_address)
+        banner_info = banner.show_banner(domain_name, proxy_address)
+        self.db.insert_banner(domain_name, self.project_id, str(banner_info))
 
     def enumerate_subdomains(self, domain_name, proxy):
         log.console_log("{}[*] Perfoming Subdomains Enumeration... {}".format(G, W))
@@ -200,6 +218,7 @@ class Belati(object):
             self.public_svn_finder(subdomain, proxy)
             try:
                 subdomain_ip_list.append(socket.gethostbyname(subdomain))
+                self.db.update_subdomain_ip(self.project_id, subdomain, str(socket.gethostbyname(subdomain)))
             except socket.gaierror:
                 pass
 
@@ -217,7 +236,8 @@ class Belati(object):
         wappalyzing = Wappalyzer()
         targeturl = self.url_req.ssl_checker(domain)
         try:
-            wappalyzing.run_wappalyze(targeturl)
+            data = wappalyzing.run_wappalyze(targeturl)
+            self.db.insert_wappalyzing(self.project_id, domain, data)
         except urllib2.URLError as exc:
             log.console_log('URL Error: {0}'.format(str(exc)))
         except urllib2.HTTPError as exc:
@@ -238,13 +258,21 @@ class Belati(object):
         signal.alarm(60)
         try:
             scan_list = str(list(Scanner(domain_name).scan()))
+            ns_record_list = []
+            mx_record_list = []
             log.console_log("{}{}{}".format(G, scan_list.replace(",","\n"), W))
             log.console_log("{}DNS Server:{}".format(G, W))
             for ns in dns.resolver.query(domain_name, 'NS'):
                 log.console_log(G + ns.to_text() + W)
+                ns_record_list.append(ns.to_text())
+
             log.console_log("{}MX Record:{}".format(G, W))
             for ns in dns.resolver.query(domain_name, 'MX'):
                 log.console_log("{}{}{}".format(G, ns.to_text(), W))
+                mx_record_list.append(ns.to_text())
+
+            self.db.update_dns_zone(self.project_id, domain_name, str(ns_record_list), str(mx_record_list))
+
         except Exception, exc:
             print("{}[*] No response from server... SKIP!{}".format(R, W))
 
@@ -258,6 +286,8 @@ class Belati(object):
         except Exception, exc:
             log.console_log("{}[-] Not found or Unavailable. {}{}".format(R, str(harvest_result), W ))
 
+        self.db.insert_email_result(self.project_id, str(harvest_result))
+
     def harvest_email_pgp(self, domain_name, proxy_address):
         harvest = HarvestEmail()
         harvest_result = harvest.crawl_pgp_mit_edu(domain_name, proxy_address)
@@ -267,10 +297,12 @@ class Belati(object):
         except Exception, exc:
             log.console_log("{}[-] Not found or Unavailable. {}{}".format(R, str(harvest_result), W ))
 
+        self.db.update_pgp_email(self.project_id, str(harvest_result))
+
     def harvest_document(self, domain_name, proxy_address):
         log.console_log("{}[*] Perfoming Public Document Harvest from Google... {}".format(G, W))
         public_doc = HarvestPublicDocument()
-        public_doc.init_crawl(domain_name, proxy_address)
+        public_doc.init_crawl(domain_name, proxy_address, self.project_id)
 
     def username_checker(self, username):
         log.console_log("{}[*] Perfoming Username Availability Checker... {}".format(G, W))
@@ -315,6 +347,7 @@ class Belati(object):
         git_finder = GitFinder()
         if git_finder.check_git(domain, proxy_address) == True:
             log.console_log("{}[+] Gotcha! You are in luck, boy![{}/.git/]{}".format(Y, domain, W))
+            self.db.update_git_finder(self.project_id, domain, "Yes")
 
     def public_svn_finder(self, domain, proxy_address):
         log.console_log("{}[*] Checking Public SVN Directory on domain {}{}".format(G, domain, W))
@@ -323,6 +356,7 @@ class Belati(object):
             log.console_log("{}[+] Um... Forbidden :( {}".format(Y, W))
         if svn_finder.check_svn(domain, proxy_address) == 200:
             log.console_log("{}[+] Gotcha! You are in luck, boy![{}/.svn/]{}".format(Y, domain, W))
+            self.db.update_svn_finder(self.project_id, domain, "Yes")
 
     def robots_scraper(self, domain, proxy_address):
         scraper = RobotsScraper()
@@ -330,11 +364,12 @@ class Belati(object):
         if data is not None and isinstance(data, int) == False and data.code == 200:
             log.console_log("{}[+] Found interesting robots.txt[ {} ] =>{}".format(Y, domain, W))
             log.console_log(data.read())
+            self.db.insert_robots_txt(self.project_id, domain, str(data.read()))
 
     def gather_company(self, company_name, proxy_address):
         log.console_log("{}[+] Gathering Company Employee {} -> {}".format(G, W, company_name))
         gather_company = GatherCompany()
-        gather_company.crawl_company_employee(company_name, proxy_address)
+        gather_company.crawl_company_employee(company_name, proxy_address, self.project_id)
 
     def check_update(self, version):
         log.console_log("{} Checking Version Update for Belati... {}".format(G, W))
@@ -358,6 +393,11 @@ class Belati(object):
 
     def timeLimitHandler(self, signum, frame):
         print("No Response...")
+
+    def strip_scheme(self, url):
+        parsed = urlparse(url)
+        scheme = "%s://" % parsed.scheme
+        return parsed.geturl().replace(scheme, '', 1)
 
 if __name__ == '__main__':
     BelatiApp = Belati()

@@ -3,6 +3,10 @@ Belati - The Traditional Swiss Army Knife For OSINT
 
 Belati is tool for Collecting Public Data & Public Document from Website and other service for OSINT purpose. This tools is inspired by Foca and Datasploit for OSINT :)
 
+## Version
+
+v.0.2.1-dev
+
 ## Why I Made this?
 Just for learning stuff and OSINT purpose. Correct me if i'm wrong
 
@@ -21,8 +25,9 @@ Just for learning stuff and OSINT purpose. Correct me if i'm wrong
 - Public Git Finder in domain/subdomain
 - Public SVN Finder in domain/subdomain
 - Robot.txt Scraper in domain/subdomain
-- Gather Public Company Employee
-
+- Gather Public Company Info & Employee
+- SQLite3 Database Support for storing Belati Results
+- Setup Wizard/Configuration for Belati
 
 ## TODO
 - Automatic OSINT with Username and Email support
@@ -33,22 +38,27 @@ Just for learning stuff and OSINT purpose. Correct me if i'm wrong
 - Email Harvesting with multiple content(github, linkedin, etc)
 - Scrapping Public Document with multiple search engine(yahoo, yandex, bing etc)
 - Metadata Extractor
-- Database Support
 - Web version with Django
 - Scanning Report export to PDF
 - domain or subdomain reputation checker
-- Reporting Support to JSON, PDF 
+- Reporting Support to JSON, PDF
+- Belati Updater
 
 ## Install/Usage
 ```
 git clone https://github.com/aancw/Belati.git
-git submodule update --init --recursive
+cd Belati
+git submodule update --init --recursive --remote
 pip install -r requirements.txt #please use pip with python v2
 sudo su
 python Belati.py --help
 ```
 
-Still on progress. Be patient.
+## Tested On
+
+Ubuntu 16.04 x86_64
+Arch Linux x86_64
+CentOS 7
 
 ## Python Requirements
 
@@ -92,9 +102,10 @@ yum install gcc gmp gmp-devel python-devel
 - Subbrute
 - nmap
 - git
+- sqlite3
 
 ## Notice
-I'm using PyWhois Library, Sublist3r, MailHarvester, Emingoo as part of my code. This tool is for educational purposes only. Any damage you make will not affect the author. Do It With Your Own Risk
+This tool is for educational purposes only. Any damage you make will not affect the author. Do It With Your Own Risk!
 
 ## Author
 Aan Wahyu a.k.a Petruknisme(https://petruknisme.com)
@@ -105,6 +116,9 @@ Thanks to PyWhois Library, Sublist3r, MailHarvester, Emingoo for being part of m
 
 Thanks to Echo-Zine Staff for approving my Ezine : http://ezine.echo.or.id/issue31/005.txt - Belati : Collecting Public Data & Public Document for OSINT Purpose - Petruknisme
 
+## Feedback/Suggestion
+
+Feel free to create Issue in this repository or email me at `cacaddv [at] gmail.com` . Your feedback and suggestion is useful for Belati development progress :)
 
 ## License
 Belati is licensed under GPL V2. You can use, modify, or redistribute this tool under the terms of GNU General Public License (GPLv2).

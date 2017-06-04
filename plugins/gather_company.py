@@ -22,6 +22,7 @@
 
 import re,sys
 from bs4 import BeautifulSoup
+from database import Database
 from logger import Logger
 from url_request import URLRequest
 
@@ -36,7 +37,10 @@ url_req = URLRequest()
 log = Logger()
 
 class GatherCompany(object):
-    def crawl_company_employee(self, company_name, proxy_address):
+    def crawl_company_employee(self, company_name, proxy_address, project_id):
+        self.db = Database()
+        self.project_id = project_id
+        self.company_id = 0
         comp_strip = company_name.replace(" ", "+")
         url = 'https://www.google.com/search?q={}+site:linkedin.com&num=200'.format(comp_strip)
 
@@ -54,21 +58,29 @@ class GatherCompany(object):
             linkedin_url = re.findall(r'(http[s]?://.*\.linkedin\.com/in/.*)', str(url_fix).strip("\'[]")) # filter only *.linked.com
             company_linkedin_url = re.findall(r'(http[s]?://.*\.linkedin\.com/company/.*)', str(url_fix).strip("\'[]")) # filter only *.linked.com/company
             job_title = soup2.find_all('div', class_='slp f')
+            url_tag = soup2.find_all("a")[0].string
 
-            if company_linkedin_url:
+            # Check if URL is match with one of the string from company name(?)
+            if company_linkedin_url and any(x in company_name for x in url_tag):
                 company_linkedin_url_list.append(company_linkedin_url)
+                self.company_id = self.db.insert_linkedin_company_info(self.project_id, str(company_name), str(company_linkedin_url), "Lorem ipsum")
 
             # Get data when linkedin url is like this : *.linkedin.com/in
             if not linkedin_url:
                 pass
             else:
-                name_fix = re.sub('<[^<]+?>', '', str(rc.h3.a)) # strip all html tags like <em>
-                job_title_fix = re.sub('<[^<]+?>', '', str(job_title)) # strip all html tags like <em>
+                name_result = re.sub('<[^<]+?>', '', str(rc.h3.a)) # strip all html tags like <em>
+                job_title_result = re.sub('<[^<]+?>', '', str(job_title)) # strip all html tags like <em>
+                name_fix = str(name_result.replace('| LinkedIn', ''))
+                job_title_fix   = str(job_title_result.replace('\u200e', ' ')).strip("\'[]")
+                linkedin_url_fix = str(linkedin_url).strip("\'[]")
                 log.console_log("{}[+] --------------------------------------------------- [+]{}".format(Y, W))
-                log.console_log("Name: {}".format( name_fix.replace('| LinkedIn', '') ))
-                log.console_log("Job Title: {}".format( str(job_title_fix.replace('\u200e', ' ')).strip("\'[]") ))
-                log.console_log("Url: {}".format( str(linkedin_url).strip("\'[]") ))
+                log.console_log("Name: {}".format( name_fix ))
+                log.console_log("Job Title: {}".format( job_title_fix ))
+                log.console_log("Url: {}".format( linkedin_url_fix ))
                 log.console_log("{}[+] --------------------------------------------------- [+]{}\n".format(Y, W))
+
+                self.db.insert_company_employees(self.company_id, name_fix, job_title_fix, linkedin_url_fix)
 
         log.console_log("\n\n{}[+] --------------------------------------------------- [+]{}".format(Y, W))
         log.console_log("{}[+] Found LinkedIn Company URL: {}".format(Y, W))
