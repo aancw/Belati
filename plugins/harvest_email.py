@@ -37,7 +37,7 @@ class HarvestEmail(object):
             dataStrip1 =  re.findall(r'[a-zA-Z0-9._+-]+@[a-zA-Z0-9._+-]+' + domain, dataStrip)
             dataStrip2 = re.findall(r'[a-zA-Z0-9._+-]+@' + domain, dataStrip)
             dataEmail = set(dataStrip1 + dataStrip2)
-            dataFix = [x for x in dataEmail if not x.startswith('x22') and not x.startswith('3D') and not x.startswith('x3d')] # ignore email because bad parsing
+            dataFix = [x for x in dataEmail if not x.startswith('x22') and not x.startswith('3D') and not x.startswith('x3d') and not x.startswith('Cached') and not x.startswith('page')] # ignore email because bad parsing
             return list(dataFix)
         except:
             pass

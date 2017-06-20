@@ -32,6 +32,7 @@ import sys, signal, socket, re
 import time
 import dns.resolver
 import tldextract
+import shlex, subprocess
 
 from plugins.about_project import AboutProject
 from plugins.banner_grab import BannerGrab
@@ -43,6 +44,7 @@ from plugins.gather_company import GatherCompany
 from plugins.git_finder import GitFinder
 from plugins.harvest_email import HarvestEmail
 from plugins.harvest_public_document import HarvestPublicDocument
+from plugins.json_beautifier import JsonBeautifier
 from plugins.logger import Logger
 from plugins.robots_scraper import RobotsScraper
 from plugins.scan_nmap import ScanNmap
@@ -94,11 +96,11 @@ class Belati(object):
 
         self.show_banner()
 
-        conf = Config()
+        self.conf = Config()
         self.db = Database()
 
         # Setup project
-        self.project_id = self.db.create_new_project(domain, orgcomp, datetime.datetime.now())
+        self.project_id = self.db.create_new_project(domain, orgcomp, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         log.console_log("{}[+] Creating New Belati Project... {}".format(G, W))
         log.console_log("---------------------------------------------------------")
         log.console_log("Project ID: {}".format(str(self.project_id)))
@@ -151,6 +153,7 @@ class Belati(object):
             log.console_log("This feature will be coming soon. Be patient :)")
 
         log.console_log("{}All done sir! All log saved in log directory and dowloaded file saved in belatiFiles {}".format(Y, W))
+        self.start_web_server()
 
     def show_banner(self):
         banner = """
@@ -196,7 +199,11 @@ class Belati(object):
         log.console_log("{}[*] Perfoming Whois... {}".format(G, W))
         whois_result = check.whois_domain(domain_name)
         email = re.findall(r'[a-zA-Z0-9._+-]+@[a-zA-Z0-9._+-]+\s*', str(whois_result))
-        self.db.insert_domain_result(self.project_id, self.strip_scheme(domain_name), str(whois_result), str(email) )
+
+        # JSON Beautifier
+        json_bf = JsonBeautifier()
+        json_whois = json_bf.beautifier(str(whois_result))
+        self.db.insert_domain_result(self.project_id, self.strip_scheme(domain_name), str(json_whois), str(email).strip("\'.\'[]") )
 
 
     def banner_grab(self, domain_name, proxy_address):
@@ -271,7 +278,7 @@ class Belati(object):
                 log.console_log("{}{}{}".format(G, ns.to_text(), W))
                 mx_record_list.append(ns.to_text())
 
-            self.db.update_dns_zone(self.project_id, domain_name, str(ns_record_list), str(mx_record_list))
+            self.db.update_dns_zone(self.project_id, domain_name, str(ns_record_list).strip("\'.\'[]"), str(mx_record_list).strip("\'[]"))
 
         except Exception, exc:
             print("{}[*] No response from server... SKIP!{}".format(R, W))
@@ -286,9 +293,10 @@ class Belati(object):
         except Exception, exc:
             log.console_log("{}[-] Not found or Unavailable. {}{}".format(R, str(harvest_result), W ))
 
-        self.db.insert_email_result(self.project_id, str(harvest_result))
+        self.db.insert_email_result(self.project_id, str(harvest_result).strip("\'.\'[]"))
 
     def harvest_email_pgp(self, domain_name, proxy_address):
+        log.console_log("{}[*] Perfoming Email Harvest from PGP Server...{}".format(G, W) )
         harvest = HarvestEmail()
         harvest_result = harvest.crawl_pgp_mit_edu(domain_name, proxy_address)
         try:
@@ -297,7 +305,7 @@ class Belati(object):
         except Exception, exc:
             log.console_log("{}[-] Not found or Unavailable. {}{}".format(R, str(harvest_result), W ))
 
-        self.db.update_pgp_email(self.project_id, str(harvest_result))
+        self.db.update_pgp_email(self.project_id, str(harvest_result).strip("\'.\'[]"))
 
     def harvest_document(self, domain_name, proxy_address):
         log.console_log("{}[*] Perfoming Public Document Harvest from Google... {}".format(G, W))
@@ -370,6 +378,20 @@ class Belati(object):
         log.console_log("{}[+] Gathering Company Employee {} -> {}".format(G, W, company_name))
         gather_company = GatherCompany()
         gather_company.crawl_company_employee(company_name, proxy_address, self.project_id)
+
+    def start_web_server(self):
+        log.console_log("{}Starting Django Web Server at http://127.0.0.1:8000/{}".format(Y, W))
+        py_bin = self.conf.get_config("Environment", "py_bin")
+        command = "{} web/manage.py runserver".format(py_bin)
+        process = subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE)
+        while True:
+            output = process.stdout.readline()
+            if output == '' and process.poll() is not None:
+                break
+            if output:
+                log.console_log(output.strip())
+        rc = process.poll()
+        return rc
 
     def check_update(self, version):
         log.console_log("{} Checking Version Update for Belati... {}".format(G, W))

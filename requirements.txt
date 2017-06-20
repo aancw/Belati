@@ -16,3 +16,4 @@ future
 beautifulsoup4
 python-whois
 futures
+django

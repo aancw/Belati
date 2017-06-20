@@ -1,0 +1,27 @@
+{% extends "header.html" %}
+
+{% block content %}
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Domain</th>
+      <th>Organization/Company</th>
+      <th>Time</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for pro in project_data %}
+    <tr>
+      <th scope="row">{{ pro.project_id }}</th>
+      <td>{{ pro.project_domain }}</td>
+      <td>{{ pro.project_org }}</td>
+      <td>{{ pro.started_time }}</td>
+      <td><button type="button" class="btn btn-info" onclick="location.href = 'projects/{{ pro.project_id }}/view';">View</button></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+</body>

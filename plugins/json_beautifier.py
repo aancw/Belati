@@ -20,15 +20,9 @@
 
 # This file is part of Belati project
 
-class AboutProject(object):
-    def __init__(self):
-        self.__info__ = 'Collecting Public Data & Public Document for OSINT purpose'
-        self.__author__ = 'Petruknisme'
-        self.__version__ = 'v0.2.2-dev'
-        self.__name__= "Belati"
-        self.__giturl__ = "https://github.com/aancw/Belati"
-        self.__authorurl__ = "https://petruknisme.com"
+import json
 
-if __name__ == '__main__':
-    AboutProjectApp = AboutProject()
-    AboutProjectApp
+class JsonBeautifier(object):
+	def beautifier(self, json_data):
+		parsed = json.loads(json_data)
+		return json.dumps(parsed, indent=4, sort_keys=True)

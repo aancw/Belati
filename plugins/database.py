@@ -41,6 +41,7 @@ class Database(object):
         db_location = conf.get_config("Database", "db_location")
         try:
             self.conn = db.connect(db_location)
+            self.conn.text_factory = str
         except db.Error, e:
             print("Error: " +  str(e.args[0]))
             sys.exit()
@@ -152,9 +153,9 @@ class Database(object):
 
         return cur.lastrowid
 
-    def insert_company_employees(self, company_id, name, job_title, linkedin_url ):
+    def insert_company_employees(self, project_id, name, job_title, linkedin_url ):
         cur = self.conn.cursor()
-        cur.execute("INSERT INTO linkedin_company_employees(`company_id`, `name`, `job_title`, `linkedin_url`) VALUES(?, ?, ?, ?)", (company_id, name, job_title, linkedin_url))
+        cur.execute("INSERT INTO linkedin_company_employees(`project_id`, `name`, `job_title`, `linkedin_url`) VALUES(?, ?, ?, ?)", (project_id, name, job_title, linkedin_url))
         self.conn.commit()
 
     # def read(table, **kwargs):

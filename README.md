@@ -5,7 +5,11 @@ Belati is tool for Collecting Public Data & Public Document from Website and oth
 
 ## Version
 
-v.0.2.1-dev
+v.0.2.2-dev
+
+## Belati In Action
+
+[Belati In Action Preview](https://www.youtube.com/watch?v=AGvsIWoaX_k)
 
 ## Why I Made this?
 Just for learning stuff and OSINT purpose. Correct me if i'm wrong
@@ -28,6 +32,7 @@ Just for learning stuff and OSINT purpose. Correct me if i'm wrong
 - Gather Public Company Info & Employee
 - SQLite3 Database Support for storing Belati Results
 - Setup Wizard/Configuration for Belati
+- Django Web Management
 
 ## TODO
 - Automatic OSINT with Username and Email support
@@ -38,7 +43,6 @@ Just for learning stuff and OSINT purpose. Correct me if i'm wrong
 - Email Harvesting with multiple content(github, linkedin, etc)
 - Scrapping Public Document with multiple search engine(yahoo, yandex, bing etc)
 - Metadata Extractor
-- Web version with Django
 - Scanning Report export to PDF
 - domain or subdomain reputation checker
 - Reporting Support to JSON, PDF
@@ -87,6 +91,35 @@ Don't worry. Belati still running when you are run with normal user ;)
 - tqdm
 - tldextract
 - fake-useragent
+
+## Missing Dependencies?
+
+If you are seeing this
+
+```
+$ python Belati.py
+
+            You are missing a module required for Belati. In order to continue using Belati, please install them with:
+
+            `pip install -r requirements.txt`
+
+            or manually install missing modules with:
+
+            `pip install dnspython requests termcolor colorama future beautifulsoup4 futures`
+```
+
+and this
+
+```
+You are using pip version 8.1.2, however version 9.0.1 is available.
+You should consider upgrading via the 'pip install --upgrade pip' command.
+```        
+
+Please upgrade pip version:
+
+```
+pip install --upgrade pip
+```
 
 ## System Dependencies
 

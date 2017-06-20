@@ -61,9 +61,17 @@ class GatherCompany(object):
             url_tag = soup2.find_all("a")[0].string
 
             # Check if URL is match with one of the string from company name(?)
-            if company_linkedin_url and any(x in company_name for x in url_tag):
-                company_linkedin_url_list.append(company_linkedin_url)
-                self.company_id = self.db.insert_linkedin_company_info(self.project_id, str(company_name), str(company_linkedin_url), "Lorem ipsum")
+            if company_linkedin_url:
+                is_contain_name = 0
+                for x in company_name.split():
+                    if x in url_tag:
+                        print(" X" + str(x) + "url tag " + str(url_tag))
+                        is_contain_name = 1
+                        break
+
+                if is_contain_name == 1:
+                    company_linkedin_url_list.append(company_linkedin_url)
+                    self.company_id = self.db.insert_linkedin_company_info(self.project_id, str(company_name), str(company_linkedin_url), "Lorem ipsum")
 
             # Get data when linkedin url is like this : *.linkedin.com/in
             if not linkedin_url:
@@ -80,7 +88,7 @@ class GatherCompany(object):
                 log.console_log("Url: {}".format( linkedin_url_fix ))
                 log.console_log("{}[+] --------------------------------------------------- [+]{}\n".format(Y, W))
 
-                self.db.insert_company_employees(self.company_id, name_fix, job_title_fix, linkedin_url_fix)
+                self.db.insert_company_employees(self.project_id, name_fix, job_title_fix, linkedin_url_fix)
 
         log.console_log("\n\n{}[+] --------------------------------------------------- [+]{}".format(Y, W))
         log.console_log("{}[+] Found LinkedIn Company URL: {}".format(Y, W))

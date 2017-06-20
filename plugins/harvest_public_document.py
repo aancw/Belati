@@ -67,8 +67,8 @@ class HarvestPublicDocument(object):
         data = re.findall(regex, data)
         list_files_download = list(set(data))
         total_files = str(len(list_files_download))
-        log.console_log("{}[*] Found {} {} files!".format(G, total_files, extension.upper(), W) )
         if total_files != "0":
+            log.console_log("{}[*] Found {} {} files!".format(G, total_files, extension.upper(), W) )
             log.console_log("{}[*] Please wait, lemme download it for you ;) {}[NO PROXY] {}".format(G, Y, W))
             for files_download in list_files_download:
                 log.no_console_log(files_download.split('/')[-1])

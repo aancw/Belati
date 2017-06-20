@@ -20,3 +20,11 @@ Update Creating Project Info
 Update Sublist3r
 Update Gather Company Plugin
 Update README
+
+v0.2.2-dev:
+
+Add Django Web Management
+Update Auto Configuration
+Add auto start Django
+Update output result
+Update Gather Company Info

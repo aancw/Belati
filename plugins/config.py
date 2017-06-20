@@ -38,7 +38,10 @@ class Config(object):
     def __init__(self):
         self.config_file = "belati.conf"
         if os.path.isfile(self.config_file):
-            pass
+            db_string = self.get_config("Database", "db_location")
+            if db_string == "belati.db":
+                log.console_log("{}[-] Hm... You are using old Belati configuration{}".format(Y, W))
+                self.init_config_file()
         else:
             log.console_log("{}[-] No Configuration file found. Setting up...{}".format(Y, W))
             self.init_config_file()
@@ -56,7 +59,19 @@ class Config(object):
 
     def init_config_file(self):
         log.console_log("\n{} -----> Initiating Configuration <-----\n{}".format(Y, W))
-        db_location = raw_input("Please enter Belati Database Location [belati.db]:") or "belati.db"
 
-        config.add_section("Database")
-        self.set_config("Database", "db_location", db_location)
+        if config.has_section("Database"):
+            pass
+        else:
+            config.add_section("Database")
+
+        self.set_config("Database", "db_location", "web/db.sqlite3")
+        log.console_log("\n{} Setting database location to {}\n{}".format(Y,"web/db.sqlite3", W))
+        python_binary = raw_input("Please enter Python v2.x Binary name [python]:") or "python"
+
+        if config.has_section("Environment"):
+            pass
+        else:
+            config.add_section("Environment")
+
+        self.set_config("Environment", "py_bin", python_binary)

@@ -1,0 +1,174 @@
+{% extends "header.html" %}
+
+{% block content %}
+<script>
+$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+  var target = $(e.target).attr("href") // activated tab
+});
+
+</script>
+<ul id="myTab" class="nav nav-tabs">
+  <li class="active"><a href="#project" data-toggle="tab">Projects</a></li>
+  <li class=""><a href="#domain" data-toggle="tab">Domain Result</a></li>
+  <li class=""><a href="#subdomain" data-toggle="tab">Subdomain</a></li>
+  <li class=""><a href="#mail_harvest" data-toggle="tab">Mail Harvest</a></li>
+  <li class=""><a href="#document" data-toggle="tab">Documents</a></li>
+  <li class=""><a href="#linkedin" data-toggle="tab">LinkedIn</a></li>
+</ul>
+<div id="myTabContent" class="tab-content">
+  <div class="tab-pane fade active in" id="project">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Domain</th>
+          <th>Organization/Company</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pro in project_data %}
+        <tr>
+          <th scope="row">{{ pro.project_id }}</th>
+          <td>{{ pro.project_domain }}</td>
+          <td>{{ pro.project_org }}</td>
+          <td>{{ pro.started_time }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="tab-pane fade" id="domain">
+    <table class="table table-hover">
+    <tbody>
+      {% for domain in main_domain %}
+      <tr>
+        <td scope="row">Domain:</th>
+        <td>{{ domain.domain }}</td>
+      </tr>
+      <tr>
+        <td>Domain Whois:</td>
+        <td>
+          {{ domain.domain_whois }}
+        </td>
+      </tr>
+      <tr>
+        <td>Emails:</td>
+        <td>{{ domain.email }}</td>
+      </tr>
+      <tr>
+        <td>NS Record:</td>
+        <td>{{ domain.ns_record }}</td>
+      </tr>
+      <tr>
+        <td>MX Record:</td>
+        <td>{{ domain.ns_record }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  <div class="tab-pane fade" id="subdomain">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Subdomain</th>
+          <th>IP Address</th>
+          <th>Banner</th>
+          <th>Wappalyzer</th>
+          <th>Robots</th>
+          <th>Git</th>
+          <th>SVN</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for subdomain in subdomain_results %}
+        <tr>
+          <th scope="row">{{ subdomain.id }}</th>
+          <td>{{ subdomain.subdomain }}</td>
+          <td>{{ subdomain.ip_address }}</td>
+          <td>{{ subdomain.banner }}</td>
+          <td>{{ subdomain.wappalyzer }}</td>
+          <td>{{ subdomain.robots_txt }}</td>
+          <td>{{ subdomain.is_contain_git }}</td>
+          <td>{{ subdomain.is_contain_svn }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="tab-pane fade" id="mail_harvest">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Mail Results</th>
+          <th>PGP Mail Results</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for mail_data in mail_harvest %}
+        <tr>
+          <th scope="row">{{ mail_data.id }}</th>
+          <td>{{ mail_data.mail_results }}</td>
+          <td>{{ mail_data.mail_pgp_results }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="tab-pane fade" id="document">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>URL</th>
+          <th>File Location</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for doc in doc_result %}
+        <tr>
+          <th scope="row">{{ doc.id }}</th>
+          <td>{{ doc.doc_url }}</td>
+          <td>{{ doc.doc_location }}</td>
+          <td><button type="button" class="btn btn-info">View</button></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="tab-pane fade" id="linkedin">
+    <h3> Company Info </h3>
+    <hr/>
+    {% for info in company_info %}
+    Company Name: {{ info.company_name }} <br/>
+    LinkedIn URL: {{ info.company_linkedin_url }}
+    {% endfor %}
+    <h3> Company Employees </h3>
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Job Title</th>
+          <th>LinkedIn URL</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for employee in company_employee %}
+        <tr>
+          <th scope="row">{{ employee.id}}</th>
+          <td>{{ employee.name }}</td>
+          <td>{{ employee.job_title }}</td>
+          <td>{{ employee.linkedin_url }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
