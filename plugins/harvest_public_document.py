@@ -75,7 +75,7 @@ class HarvestPublicDocument(object):
                     log.no_console_log(files_download.split('/')[-1])
                     self.download_files(files_download, domain)
         else:
-            log.console_log("{}[!] Error: Google probably now is blocking our requests".format(G))
+            log.console_log("{}[!] Error: Google probably now is blocking our requests{}".format(R,W))
 
     def download_files(self, url, folder_domain):
         filename = url.split('/')[-1]
