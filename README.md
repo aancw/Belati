@@ -1,4 +1,13 @@
 # Belati
+
+[![Awesome OSINT](https://img.shields.io/badge/awesome-osint-brightgreen.svg)](https://github.com/jivoi/awesome-osint)
+[![OSINT Framework](https://img.shields.io/badge/osint-framework-brightgreen.svg)](http://osintframework.com)
+[![n0where](https://img.shields.io/badge/n0where-top%20100-lightgrey.svg)](https://n0where.net/best-cybersecurity-tools/)
+[![ToolsWatch](https://img.shields.io/badge/Tools-Watch-brightgreen.svg)](http://www.toolswatch.org/2017/07/belati-v-0-2-2-dev-swiss-army-knife-for-osint/)
+[![Echo Ezine 31](https://img.shields.io/badge/Echo-Ezine%2031-yellow.svg)](http://ezine.echo.or.id/issue31/005.txt)
+
+
+
 Belati - The Traditional Swiss Army Knife For OSINT
 
 Belati is tool for Collecting Public Data & Public Document from Website and other service for OSINT purpose. This tools is inspired by Foca and Datasploit for OSINT :)
