@@ -380,9 +380,9 @@ class Belati(object):
         gather_company.crawl_company_employee(company_name, proxy_address, self.project_id)
 
     def start_web_server(self):
-        log.console_log("{}Starting Django Web Server at http://127.0.0.1:8000/{}".format(Y, W))
+        log.console_log("{}Starting Django Web Server at http://0.0.0.0:8000/{}".format(Y, W))
         py_bin = self.conf.get_config("Environment", "py_bin")
-        command = "{} web/manage.py runserver".format(py_bin)
+        command = "{} web/manage.py runserver 0.0.0.0:8000".format(py_bin)
         process = subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE)
         while True:
             output = process.stdout.readline()
