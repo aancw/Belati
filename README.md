@@ -7,7 +7,7 @@
 [![OSINT Framework](https://img.shields.io/badge/osint-framework-brightgreen.svg)](http://osintframework.com)
 [![n0where](https://img.shields.io/badge/n0where-top%20100-lightgrey.svg)](https://n0where.net/best-cybersecurity-tools/)
 [![ToolsWatch](https://img.shields.io/badge/Tools-Watch-brightgreen.svg)](http://www.toolswatch.org/2017/07/belati-v-0-2-2-dev-swiss-army-knife-for-osint/)
-[![BlackArch Scanner](https://img.shields.io/badge/BlackArch-Scanner-red.svg)](hhttps://blackarch.org/scanner.html)
+[![BlackArch Scanner](https://img.shields.io/badge/BlackArch-Scanner-red.svg)](https://blackarch.org/scanner.html)
 [![Echo Ezine 31](https://img.shields.io/badge/Echo-Ezine%2031-yellow.svg)](http://ezine.echo.or.id/issue31/005.txt)
 
 
