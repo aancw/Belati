@@ -20,7 +20,7 @@
 
 # This file is part of Belati project
 
-import sys
+import sys, socket
 import ssl
 import urllib2
 from user_agents import UserAgents
@@ -151,3 +151,13 @@ class URLRequest(object):
             domain_fix = "https://{}".format(domain)
 
         return domain_fix
+
+    def connection_test(self):
+        server_test = "github.com"
+        try:
+            host = socket.gethostbyname(server_test)
+            s = socket.create_connection((host, 80), 2)
+            return True
+        except:
+            pass
+        return False

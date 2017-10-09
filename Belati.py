@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+    #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 #   Belati is tool for Collecting Public Data & Public Document from Website and other service for OSINT purpose.
@@ -46,10 +46,13 @@ from plugins.harvest_email import HarvestEmail
 from plugins.harvest_public_document import HarvestPublicDocument
 from plugins.json_beautifier import JsonBeautifier
 from plugins.logger import Logger
+from plugins.meta_exif_extractor import MetaExifExtractor
 from plugins.robots_scraper import RobotsScraper
 from plugins.scan_nmap import ScanNmap
 from plugins.svn_finder import SVNFinder
+from plugins.updater import Updater
 from plugins.url_request import URLRequest
+from plugins.util import Util
 from plugins.wappalyzer import Wappalyzer
 
 from lib.Sublist3r import sublist3r
@@ -65,6 +68,7 @@ R = '\033[91m'  # red
 W = '\033[0m'   # white
 
 log = Logger()
+util = Util()
 
 class Belati(object):
     def __init__(self):
@@ -77,7 +81,7 @@ class Belati(object):
         parser.add_argument('-u', action='store', dest='username' , help='Perform OSINT from username e.g petruknisme')
         parser.add_argument('-e', action='store', dest='email' , help='Perform OSINT from email address')
         parser.add_argument('-c', action='store', dest='orgcomp' , help='Perform OSINT from Organization or Company Name, use double quote')
-        parser.add_argument('-o', action='store', dest='output_files' , help='Save log for output files')
+        parser.add_argument('--ws-only', action='store_true', dest='ws_mode' , help='Launch Webserver Only Mode')
         parser.add_argument('--db-file', action='store', dest='db_file_location' , help='Specify Database File Location(SQLite3)')
         parser.add_argument('--single-proxy', action='store', dest='single_proxy', help='Proxy support with single IP (ex: http://127.0.0.1:8080)' )
         parser.add_argument('--proxy-file', action='store', dest='proxy_file_location', help='Proxy support from Proxy List File')
@@ -92,15 +96,32 @@ class Belati(object):
         single_proxy = results.single_proxy
         proxy_file_location = results.proxy_file_location
         proxy = ""
+        ws_mode = results.ws_mode
+        current_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         self.multiple_proxy_list = []
 
         self.show_banner()
-
+        
         self.conf = Config()
         self.db = Database()
 
+        if domain is None and orgcomp is None and ws_mode:
+            log.console_log("{}[*] Entering Web Server Only Mode...{}".format(Y,W))
+            self.start_web_server()
+            sys.exit()
+
+        if domain is None and orgcomp is None:
+            log.console_log("{}[-] Please specify domain/organization {}".format(R, W))
+            sys.exit()
+
+        log.console_log("{}[*] Starting at: {} {}".format(Y, current_time , W))
+
+        self.updater = Updater()
+        self.updater.check_update(self.about.__version__)
+
+
         # Setup project
-        self.project_id = self.db.create_new_project(domain, orgcomp, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        self.project_id = self.db.create_new_project(domain, orgcomp, current_time)
         log.console_log("{}[+] Creating New Belati Project... {}".format(G, W))
         log.console_log("---------------------------------------------------------")
         log.console_log("Project ID: {}".format(str(self.project_id)))
@@ -152,20 +173,26 @@ class Belati(object):
         if email is not None:
             log.console_log("This feature will be coming soon. Be patient :)")
 
-        log.console_log("{}All done sir! All log saved in log directory and dowloaded file saved in belatiFiles {}".format(Y, W))
+        log.console_log("{}All done sir! All logs saved in `log` directory and dowloaded file saved in `belatiFiles` {}".format(Y, W))
         self.start_web_server()
 
     def show_banner(self):
         banner = """
         {}
-         /$$$$$$$  /$$$$$$$$ /$$        /$$$$$$  /$$$$$$$$ /$$$$$$
-        | $$__  $$| $$_____/| $$       /$$__  $$|__  $$__/|_  $$_/
-        | $$  \ $$| $$      | $$      | $$  \ $$   | $$     | $$
-        | $$$$$$$ | $$$$$   | $$      | $$$$$$$$   | $$     | $$
-        | $$__  $$| $$__/   | $$      | $$__  $$   | $$     | $$
-        | $$  \ $$| $$      | $$      | $$  | $$   | $$     | $$
-        | $$$$$$$/| $$$$$$$$| $$$$$$$$| $$  | $$   | $$    /$$$$$$
-        |_______/ |________/|________/|__/  |__/   |__/   |______/
+
+         /$$$$$$$  /$$$$$$$$ /$$        /$$$$$$  /$$$$$$$$     .
+        | $$__  $$| $$_____/| $$       /$$__  $$|__  $$__/    J:L
+        | $$  \ $$| $$      | $$      | $$  \ $$   | $$       |:|
+        | $$$$$$$ | $$$$$   | $$      | $$$$$$$$   | $$       |:|
+        | $$__  $$| $$__/   | $$      | $$__  $$   | $$       |:|
+        | $$  \ $$| $$      | $$      | $$  | $$   | $$       |:|
+        | $$$$$$$/| $$$$$$$$| $$$$$$$$| $$  | $$   | $$   /]  |:|  [\ 
+        |_______/ |________/|________/|__/  |__/   |__/   \:-'\"""'-:/
+                                                            ""III""
+                                                              III
+                                                              III
+                                                              III
+                                                             (___)
 
                                 The Traditional Swiss Army Knife for OSINT
 
@@ -203,7 +230,7 @@ class Belati(object):
         # JSON Beautifier
         json_bf = JsonBeautifier()
         json_whois = json_bf.beautifier(str(whois_result))
-        self.db.insert_domain_result(self.project_id, self.strip_scheme(domain_name), str(json_whois), str(email).strip("\'.\'[]") )
+        self.db.insert_domain_result(self.project_id, util.strip_scheme(domain_name), str(json_whois), util.clean_list_string(email))
 
 
     def banner_grab(self, domain_name, proxy_address):
@@ -278,7 +305,7 @@ class Belati(object):
                 log.console_log("{}{}{}".format(G, ns.to_text(), W))
                 mx_record_list.append(ns.to_text())
 
-            self.db.update_dns_zone(self.project_id, domain_name, str(ns_record_list).strip("\'.\'[]"), str(mx_record_list).strip("\'[]"))
+            self.db.update_dns_zone(self.project_id, domain_name, util.clean_list_string(ns_record_list), util.clean_list_string(mx_record_list))
 
         except Exception, exc:
             print("{}[*] No response from server... SKIP!{}".format(R, W))
@@ -293,7 +320,7 @@ class Belati(object):
         except Exception, exc:
             log.console_log("{}[-] Not found or Unavailable. {}{}".format(R, str(harvest_result), W ))
 
-        self.db.insert_email_result(self.project_id, str(harvest_result).strip("\'.\'[]"))
+        self.db.insert_email_result(self.project_id, util.clean_list_string(harvest_result))
 
     def harvest_email_pgp(self, domain_name, proxy_address):
         log.console_log("{}[*] Perfoming Email Harvest from PGP Server...{}".format(G, W) )
@@ -305,7 +332,7 @@ class Belati(object):
         except Exception, exc:
             log.console_log("{}[-] Not found or Unavailable. {}{}".format(R, str(harvest_result), W ))
 
-        self.db.update_pgp_email(self.project_id, str(harvest_result).strip("\'.\'[]"))
+        self.db.update_pgp_email(self.project_id, util.clean_list_string(harvest_result))
 
     def harvest_document(self, domain_name, proxy_address):
         log.console_log("{}[*] Perfoming Public Document Harvest from Google... {}".format(G, W))
@@ -393,33 +420,13 @@ class Belati(object):
         rc = process.poll()
         return rc
 
-    def check_update(self, version):
-        log.console_log("{} Checking Version Update for Belati... {}".format(G, W))
-        # TODO
-
-
     def common_service_check(self, host):
         log.console_log("{}[*] Checking Common Service Check on host {}{}".format(G, host, W))
         service_check = CommonServiceCheck()
         service_check.check_available_service(host)
 
-    def check_python_version(self):
-        if sys.version[:3] == "2.7" or "2" in sys.version[:3]:
-            log.console_log("{}[*] Python version OK! {}{}".format(G, sys.version[:6], W))
-        elif "3" in sys.version[:3]:
-            log.console_log("{}[-] Nope. This system not yet compatible for Python 3!{}".format(Y, W))
-            sys.exit()
-        else:
-            log.console_log("{}[-] Duh. Your python version too old for running this :({}".format(Y, W))
-            sys.exit()
-
     def timeLimitHandler(self, signum, frame):
         print("No Response...")
-
-    def strip_scheme(self, url):
-        parsed = urlparse(url)
-        scheme = "%s://" % parsed.scheme
-        return parsed.geturl().replace(scheme, '', 1)
 
 if __name__ == '__main__':
     BelatiApp = Belati()

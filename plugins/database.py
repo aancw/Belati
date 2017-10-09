@@ -141,9 +141,9 @@ class Database(object):
         cur.execute("UPDATE mail_harvest_results SET mail_pgp_results = ? WHERE project_id = ?", (mail_pgp_results, project_id))
         self.conn.commit()
 
-    def insert_public_doc(self, project_id, doc_ext, doc_url, doc_location):
+    def insert_public_doc(self, project_id, doc_ext, doc_url, doc_location, doc_full_location, doc_meta_exif):
         cur = self.conn.cursor()
-        cur.execute("INSERT INTO doc_results(`project_id`, `doc_ext`, `doc_url`, `doc_location`) VALUES(?, ?, ?, ?)", (project_id, doc_ext, doc_url, doc_location))
+        cur.execute("INSERT INTO doc_results(`project_id`, `doc_ext`, `doc_url`, `doc_location`, `doc_full_location`, `doc_meta_exif` ) VALUES(?, ?, ?, ?, ?, ?)", (project_id, doc_ext, doc_url, doc_location, doc_full_location, doc_meta_exif))
         self.conn.commit()
 
     def insert_linkedin_company_info(self, project_id, company_name, company_linkedin_url, company_description):

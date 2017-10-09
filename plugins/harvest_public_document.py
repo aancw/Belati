@@ -27,6 +27,8 @@ from logger import Logger
 from tqdm import tqdm
 import requests
 from url_request import URLRequest
+from meta_exif_extractor import MetaExifExtractor
+from util import Util
 
 # Console color
 G = '\033[92m'  # green
@@ -37,6 +39,7 @@ W = '\033[0m'   # white
 
 url_req = URLRequest()
 log = Logger()
+util = Util()
 
 class HarvestPublicDocument(object):
     def __init__(self):
@@ -77,7 +80,9 @@ class HarvestPublicDocument(object):
     def download_files(self, url, folder_domain):
         filename = url.split('/')[-1]
         full_filename = 'belatiFiles/{}/{}'.format(folder_domain, filename)
-        self.db.insert_public_doc(self.project_id, str(os.path.splitext(filename)[1]), str(url), str(full_filename))
+        full_filename_location = '{}/belatiFiles/{}/{}'.format(util.get_current_work_dir(), folder_domain, filename)
+        meta = MetaExifExtractor()
+
         if not os.path.exists(os.path.dirname(full_filename)):
             try:
                 os.makedirs(os.path.dirname(full_filename))
@@ -90,6 +95,9 @@ class HarvestPublicDocument(object):
                 urllib.urlretrieve(url, filename=full_filename,reporthook=self.my_hook(t), data=None)
             except:
                 pass
+
+        meta_exif_json = meta.extract_json(full_filename_location)
+        self.db.insert_public_doc(self.project_id, str(os.path.splitext(filename)[1]), str(url), str(full_filename), str(full_filename_location), str(meta_exif_json))
 
     def my_hook(self,t):
       """

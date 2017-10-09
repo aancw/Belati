@@ -135,9 +135,12 @@ class DocResults(models.Model):
     doc_ext = models.TextField(blank=True, null=True)
     doc_url = models.TextField(blank=True, null=True)
     doc_location = models.TextField(blank=True, null=True)
-
+    doc_full_location = models.TextField(blank=True, null=True)
+    doc_meta_exif = models.TextField(blank=True, null=True)
+    doc_author = models.TextField(blank=True, null=True)
+    
     class Meta:
-        managed = False
+        managed = True
         db_table = 'doc_results'
 
 
@@ -149,7 +152,7 @@ class LinkedinCompanyEmployees(models.Model):
     linkedin_url = models.IntegerField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'linkedin_company_employees'
 
 
@@ -161,7 +164,7 @@ class LinkedinCompanyInfo(models.Model):
     company_description = models.IntegerField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'linkedin_company_info'
 
 
@@ -172,7 +175,7 @@ class MailHarvestResults(models.Model):
     mail_pgp_results = models.TextField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'mail_harvest_results'
 
 
@@ -188,7 +191,7 @@ class MainDomainResults(models.Model):
     mx_record = models.TextField(db_column='MX_record', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'main_domain_results'
 
 
@@ -199,7 +202,7 @@ class Projects(models.Model):
     started_time = models.TextField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'projects'
 
     def __unicode__(self):
@@ -217,5 +220,5 @@ class SubdomainResults(models.Model):
     is_contain_svn = models.IntegerField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'subdomain_results'

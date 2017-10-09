@@ -9,3 +9,5 @@ plugins/.directory
 proxy.txt
 belati.conf
 beta/*
+#remove comment after 0.2.3-dev
+#web/web/db.sqlite3

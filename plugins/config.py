@@ -23,6 +23,7 @@
 import sys, os, errno
 import ConfigParser
 from logger import Logger
+from util import Util
 
 # Console color
 G = '\033[92m'  # green
@@ -33,6 +34,7 @@ W = '\033[0m'   # white
 
 log = Logger()
 config = ConfigParser.ConfigParser()
+util = Util()
 
 class Config(object):
     def __init__(self):
@@ -67,11 +69,15 @@ class Config(object):
 
         self.set_config("Database", "db_location", "web/db.sqlite3")
         log.console_log("\n{} Setting database location to {}\n{}".format(Y,"web/db.sqlite3", W))
-        python_binary = raw_input("Please enter Python v2.x Binary name [python]:") or "python"
 
         if config.has_section("Environment"):
             pass
         else:
             config.add_section("Environment")
+        
+        log.console_log("{} Setting Current Directory to {} {}".format(Y, util.get_current_work_dir(), W))   
+
+        python_binary = raw_input("\nPlease enter Python v2.x Binary name [python]:") or "python"
 
         self.set_config("Environment", "py_bin", python_binary)
+        self.set_config("Environment", "curr_dir", util.get_current_work_dir())

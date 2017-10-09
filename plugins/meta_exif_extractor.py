@@ -20,18 +20,16 @@
 
 # This file is part of Belati project
 
-from url_request import URLRequest
+import pyexifinfo as p
+import json
 
-url_req = URLRequest()
+class MetaExifExtractor(object):
+	def extract_json(self, filename):
+		data = p.get_json(filename)
+		json_data = json.dumps(data, sort_keys=True, indent=4, separators=(',', ': '))
+		return json_data
 
-class RobotsScraper(object):
-    def check_robots(self, domain_name, proxy_address):
-        try:
-            url_request = "{}/robots.txt".format(domain_name)
-            data = url_req.just_url_open(url_request, proxy_address)
-            if data is not "" and data is not "notexist":
-            	# We need to check if file is valid, no redirect, no reload, or something
-                if data.getcode() == 200 and data.getcode() != 302 and url_request in data.geturl() :
-                    return data
-        except:
-            pass
+	def extract_xml(self, filename):
+		data = p.get_xml(filename)
+		return data	
+

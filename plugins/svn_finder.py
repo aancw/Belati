@@ -40,7 +40,7 @@ class SVNFinder(object):
             if data is not None and data is not "notexist":
                 if data == 403:
                     return data
-                if data.getcode() == 200 and data.getcode() != 302:
+                if data.getcode() == 200 and data.getcode() != 302 and url_request in data.geturl():
                     return data.getcode()
         except:
             pass

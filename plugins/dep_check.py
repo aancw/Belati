@@ -69,11 +69,11 @@ class DepCheck(object):
             missing_deps_warning ="""
             You are missing a module required for Belati. In order to continue using Belati, please install them with:
 
-            {}`pip install -r requirements.txt`{}
+            {}`pip install --upgrade --force-reinstall -r requirements.txt`{}
 
             or manually install missing modules with:
 
-            {}`pip install {}`{}
+            {}`pip install --upgrade --force-reinstall {}`{}
 
             """
 

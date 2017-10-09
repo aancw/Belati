@@ -28,3 +28,15 @@ Update Auto Configuration
 Add auto start Django
 Update output result
 Update Gather Company Info
+
+v0.2.3-dev
+
+Add Metadata/exif info for document
+Update Database Schema
+Auto Update system
+Update URL File validation checker
+Clean Output Result
+Update Banner
+Check git control status for update checker
+Add Web Server Only Mode
+Rework Code
