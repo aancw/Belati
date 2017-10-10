@@ -55,6 +55,20 @@ Just for learning stuff and OSINT purpose. Correct me if i'm wrong
 
 Please see Belati TODO list here -> https://github.com/aancw/Belati/issues/12
 
+## Library
+
+- python-whois
+- Sublist3r
+- Subbrute
+
+## Requirements
+
+- nmap
+- git
+- sqlite3
+- exiftool
+
+
 ## Install/Usage
 
 ```
@@ -152,13 +166,6 @@ For CentOS/Fedora user, please install this:
 yum install gcc gmp gmp-devel python-devel
 ```
 
-## Library
-- python-whois
-- Sublist3r
-- Subbrute
-- nmap
-- git
-- sqlite3
 
 ## Notice
 
