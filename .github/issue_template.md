@@ -5,7 +5,7 @@ Please provide the following details.
 - OS :
 - Python version (`python --version`) :
 - Pip version (`pip --version`) :
-- Output of `pip freeze` :
+- Output of `pip freeze` : [Upload the output to GitHub gists and provide link]
 
 ### Error Description
 
