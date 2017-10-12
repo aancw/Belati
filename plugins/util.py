@@ -64,7 +64,7 @@ class Util(object):
 	
     def clean_version_string(self, text):
     	# strip v0.2.2-dev
-    	strip_dev = text.strip("-dev")
+    	strip_dev = text.strip("-dev\n")
     	return strip_dev
 
     def get_current_work_dir(self):

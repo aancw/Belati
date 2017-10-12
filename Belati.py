@@ -317,10 +317,9 @@ class Belati(object):
         try:
             log.console_log("{}[*] Found {} emails on domain {}{}".format(Y, str(len(harvest_result)), domain_name, W))
             log.console_log("{}{}{}".format(R, '\n'.join(harvest_result), W))
+            self.db.insert_email_result(self.project_id, util.clean_list_string(harvest_result))
         except Exception, exc:
             log.console_log("{}[-] Not found or Unavailable. {}{}".format(R, str(harvest_result), W ))
-
-        self.db.insert_email_result(self.project_id, util.clean_list_string(harvest_result))
 
     def harvest_email_pgp(self, domain_name, proxy_address):
         log.console_log("{}[*] Perfoming Email Harvest from PGP Server...{}".format(G, W) )
@@ -329,10 +328,9 @@ class Belati(object):
         try:
             log.console_log("{}[*] Found {} emails on domain {}{}".format(Y, str(len(harvest_result)), domain_name, W))
             log.console_log("{}{}{}".format(R, '\n'.join(harvest_result), W))
+            self.db.update_pgp_email(self.project_id, util.clean_list_string(harvest_result))
         except Exception, exc:
             log.console_log("{}[-] Not found or Unavailable. {}{}".format(R, str(harvest_result), W ))
-
-        self.db.update_pgp_email(self.project_id, util.clean_list_string(harvest_result))
 
     def harvest_document(self, domain_name, proxy_address):
         log.console_log("{}[*] Perfoming Public Document Harvest from Google... {}".format(G, W))
