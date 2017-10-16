@@ -83,15 +83,30 @@ python Belati.py --help
 
 ## Docker Installation
 
-For Docker user, please refer to this guide:
+- Download Dockerfile:
 
-https://github.com/espi0n/Dockerfiles/blob/master/Belati/README.md
+```bash
+wget https://raw.githubusercontent.com/aancw/Belati/master/Dockerfile
+```
+
+- Execute the following command to create a Docker image locally:
+  ```bash
+  docker build -t belati .
+  ```
+
+- To create a container from the image, execute:
+  ```bash
+  docker run -p 8000:8000 -it belati /bin/bash
+  ```
+
+For more info, please refer to this guide: https://github.com/espi0n/Dockerfiles/blob/master/Belati/README.md
 
 ## Tested On
 
 Ubuntu 16.04 x86_64
 Arch Linux x86_64
 CentOS 7
+Debian Jessie
 MacOS
 
 ## Python Requirements
