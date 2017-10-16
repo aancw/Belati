@@ -45,6 +45,7 @@ Just for learning stuff and OSINT purpose. Correct me if i'm wrong
 - SQLite3 Database Support for storing Belati Results
 - Setup Wizard/Configuration for Belati
 - Django Web Management
+- Webserver only mode
 - Auto Dependency Checker
 - Auto Update system
 - Document Metadata/Exif Extractor
@@ -99,15 +100,21 @@ wget https://raw.githubusercontent.com/aancw/Belati/master/Dockerfile
   docker run -p 8000:8000 -it belati /bin/bash
   ```
 
+- Running Belati
+    ```bash
+    belati -h
+    ```
+
+
 For more info, please refer to this guide: https://github.com/espi0n/Dockerfiles/blob/master/Belati/README.md
 
 ## Tested On
 
-Ubuntu 16.04 x86_64
-Arch Linux x86_64
-CentOS 7
-Debian Jessie
-MacOS
+- Ubuntu 16.04 x86_64
+- Arch Linux x86_64
+- CentOS 7
+- Debian Jessie
+- MacOS
 
 ## Python Requirements
 
