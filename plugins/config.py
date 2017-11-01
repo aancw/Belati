@@ -74,10 +74,13 @@ class Config(object):
             pass
         else:
             config.add_section("Environment")
-        
-        log.console_log("{} Setting Current Directory to {} {}".format(Y, util.get_current_work_dir(), W))   
 
-        python_binary = raw_input("\nPlease enter Python v2.x Binary name [python]:") or "python"
+        log.console_log("{} Setting Current Directory to {} {}".format(Y, util.get_current_work_dir(), W))
+
+        if os.path.isfile('/usr/bin/python') and os.access('/usr/bin/python', os.X_OK) and (sys.version_info[0] == 2 ):
+           python_binary = "python"
+        else:
+           python_binary = raw_input("\nPlease enter Python v2.x Binary name [python]:")
 
         self.set_config("Environment", "py_bin", python_binary)
         self.set_config("Environment", "curr_dir", util.get_current_work_dir())
