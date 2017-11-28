@@ -130,25 +130,15 @@ class URLRequest(object):
 				return "notexist"
 
     def ssl_checker(self, domain):
-        use_ssl = False
-        domain_fix = ""
+        domain_fix = "https://{}".format(domain)
 
         try:
             # Skip SSL Verification Check!
             # https://stackoverflow.com/questions/27835619/ssl-certificate-verify-failed-error
             gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)  # Only for gangstars
             data = urllib2.urlopen("https://{}".format(domain), timeout=25, context=gcontext)
-            if not "ERROR" in data:
-                use_ssl = True
-        except urllib2.HTTPError, e:
-            pass
-        except urllib2.URLError, e:
-            pass
-
-        if use_ssl == False:
+        except ssl.SSLError as e:
             domain_fix = "http://{}".format(domain)
-        else:
-            domain_fix = "https://{}".format(domain)
 
         return domain_fix
 
