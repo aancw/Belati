@@ -22,7 +22,7 @@
 
 import sys, socket
 import ssl
-import urllib2
+import urllib2, httplib
 from user_agents import UserAgents
 from urlparse import urlparse
 from logger import Logger
@@ -99,6 +99,8 @@ class URLRequest(object):
         except Exception, detail:
             log.console_log('ERROR {}'.format( str(detail)))
             return 1
+        except httplib.BadStatusLine:
+            pass
 
     def just_url_open(self, url_request, proxy_address):
         try:
@@ -137,7 +139,15 @@ class URLRequest(object):
             # https://stackoverflow.com/questions/27835619/ssl-certificate-verify-failed-error
             gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)  # Only for gangstars
             data = urllib2.urlopen("https://{}".format(domain), timeout=25, context=gcontext)
+            if "ERROR" in data or "Errno" in data:
+                domain_fix = "http://{}".format(domain)
+        except urllib2.HTTPError, e:
+            pass
+        except urllib2.URLError, e:
+            domain_fix = "http://{}".format(domain)
         except ssl.SSLError as e:
+            domain_fix = "http://{}".format(domain)
+        except httplib.BadStatusLine:
             domain_fix = "http://{}".format(domain)
 
         return domain_fix

@@ -209,7 +209,12 @@ Please see [CONTRIBUTORS.md](https://github.com/aancw/Belati/blob/master/CONTRIB
 
 Thanks to PyWhois Library, Sublist3r, MailHarvester, Emingoo for being part of my code. Also thanks to Hispagatos, Infosec-ninjas, eCHo, RNDC( Research and development center ) and all other people who are inspiring this project :)
 
-Thanks to Echo-Zine Staff for approving my Ezine : http://ezine.echo.or.id/issue31/005.txt - Belati : Collecting Public Data & Public Document for OSINT Purpose - Petruknisme
+## Publications
+
+Echo Ezine 31 : http://ezine.echo.or.id/issue31/005.txt - Belati : Collecting Public Data & Public Document for OSINT Purpose - Petruknisme
+
+IDSECCONF 2017 : https://www.slideshare.net/idsecconf/belati-the-traditional-swiss-army-knife-for-osint - Belati: The Traditional Swiss Army Knife for OSINT
+
 
 ## License
 
