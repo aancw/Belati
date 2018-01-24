@@ -16,6 +16,6 @@ future
 beautifulsoup4
 python-whois
 futures
-Django==1.11.6
+Django
 pyexifinfo
 cmd2
