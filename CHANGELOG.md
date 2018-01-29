@@ -40,3 +40,12 @@ v0.2.3-dev
 - Check git control status for update checker
 - Add Web Server Only Mode
 - Rework Code
+
+v0.2.4
+
+- Migrating argument parse to interactive command line shell
+- Implementing command line shell mode
+- Remove git branch version from Dockerfile
+- Update Dependencies Checker, more accurate with module version comparison 
+- Migrating sublist3r to manual checking dnsdumpster, crtsh and other service will coming soon
+- Fixing bug for stability and improvement

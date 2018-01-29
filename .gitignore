@@ -1,3 +1,5 @@
+__pycache__/
+plugins/__pycache__/
 *.pyc
 lib/*.pyc
 plugins/*.pyc
@@ -10,4 +12,4 @@ proxy.txt
 belati.conf
 beta/*
 #remove comment after 0.2.3-dev
-web/web/db.sqlite3
+web/db.sqlite3

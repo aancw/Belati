@@ -17,16 +17,17 @@ Belati is tool for Collecting Public Data & Public Document from Website and oth
 
 ## Current Version
 
-v0.2.3-dev
+v0.2.4
 
 ## Belati In Action
 
-[Belati In Action Preview](https://www.youtube.com/watch?v=AGvsIWoaX_k)
+[![Belati In Action 0.24-stable Preview](https://img.youtube.com/vi/yRSln6BSo-c/0.jpg)](https://www.youtube.com/watch?v=yRSln6BSo-c)
 
 ## Why I Made this?
 Just for learning stuff and OSINT purpose. Correct me if i'm wrong
 
 ## What Belati can do?
+- Interactive command line shell
 - Whois(Indonesian TLD Support)
 - Banner Grabbing
 - Subdomain Enumeration
@@ -92,7 +93,7 @@ wget https://raw.githubusercontent.com/aancw/Belati/master/Dockerfile
 
 - Execute the following command to create a Docker image locally:
   ```bash
-  docker build -t belati .
+  docker build -t belati . #dot
   ```
 
 - To create a container from the image, execute:
@@ -129,6 +130,7 @@ Reference -> https://secwiki.org/w/Running_nmap_as_an_unprivileged_user
 Don't worry. Belati still running well when you are run with normal user ;)
 
 ## Dependencies
+
 - urllib2
 - dnspython
 - requests
@@ -150,6 +152,8 @@ Don't worry. Belati still running well when you are run with normal user ;)
 - futures
 - django
 - pyexifinfo
+- cmd2
+- tabulate
 
 ## Missing Dependencies?
 

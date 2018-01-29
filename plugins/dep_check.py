@@ -20,7 +20,7 @@
 
 # This file is part of Belati project
 
-import sys, os
+import sys, os, operator, pkg_resources
 from logger import Logger
 
 # Console color
@@ -58,13 +58,28 @@ class DepCheck(object):
         pip_list = sorted([(i.key) for i in pip.get_installed_distributions()])
 
         for req_dep in list_deps:
-            if req_dep not in pip_list:
-                # Why this package is not in get_installed_distributions ?
-                if str(req_dep) == "argparse":
-                    pass
+            compare_char = ["==", ">=", "<=", ">", "<", "!="]
+            for c in compare_char:
+                if c in req_dep:
+                    pkg = req_dep.split(c)
+                    if pkg[0] not in pip_list:
+                        missing_deps.append(req_dep)
+                        break
+                    else:
+                        installed_ver = pkg_resources.get_distribution(pkg[0]).version
+                        if self.get_truth(installed_ver, c, pkg[1]):
+                            break
+                        else:
+                            missing_deps.append(req_dep)                            
                 else:
-                    missing_deps.append(req_dep)
+                    if req_dep not in pip_list:
+                        # Why this package is not in get_installed_distributions ?
+                        if str(req_dep) == "argparse":
+                            pass
+                        else:
+                            missing_deps.append(req_dep)
 
+        missing_deps = set(missing_deps)
         if missing_deps:
             missing_deps_warning ="""
             You are missing a module required for Belati. In order to continue using Belati, please install them with:
@@ -79,3 +94,11 @@ class DepCheck(object):
 
             log.console_log(missing_deps_warning.format(Y, W, Y, ' '.join(missing_deps), W))
             sys.exit()
+
+    def get_truth(self, inp, relate, cut):
+        ops = {'>': operator.gt,
+        '<': operator.lt,
+        '>=': operator.ge,
+        '<=': operator.le,
+        '==': operator.eq}
+        return ops[relate](inp, cut)

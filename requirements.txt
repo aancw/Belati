@@ -16,6 +16,8 @@ future
 beautifulsoup4
 python-whois
 futures
-django
+django==1.11.6
 pyexifinfo
 cmd2
+tabulate
+dnsdumpster

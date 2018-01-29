@@ -42,11 +42,11 @@ class GatherCompany(object):
         self.project_id = project_id
         self.company_id = 0
         comp_strip = company_name.replace(" ", "+")
-        url = 'https://www.google.com/search?q={}+site:linkedin.com&num=200'.format(comp_strip)
+        url = 'https://www.google.com/search?q="Current+*+{}+*"+site:linkedin.com&num=200'.format(comp_strip)
 
         data = url_req.standart_request(url, proxy_address)
 
-        soup = BeautifulSoup( data, 'html.parser' )
+        soup = BeautifulSoup( data, 'html.parser')
         company_linkedin_url_list = []
 
         #Getting all h3 tags with class 'r'
@@ -65,7 +65,6 @@ class GatherCompany(object):
                 is_contain_name = 0
                 for x in company_name.split():
                     if x in url_tag:
-                        print(" X" + str(x) + "url tag " + str(url_tag))
                         is_contain_name = 1
                         break
 

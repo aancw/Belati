@@ -21,18 +21,37 @@
 # This file is part of Belati project
 
 import sys
+
+from bs4 import BeautifulSoup
+from dnsdumpster.DNSDumpsterAPI import DNSDumpsterAPI
 from url_request import URLRequest
 
 url_req = URLRequest()
 
-class BannerGrab(object):
-    def show_banner(self, domain_name, proxy_address):
-        try:
-            data = url_req.header_info(domain_name, proxy_address)
-            return data
-        except:
-            pass
+class SubdomainEnum(object):
+	def scan_dnsdumpster(self, domain_name):
+		results = DNSDumpsterAPI().search(domain_name)
+		return results
 
-if __name__ == '__main__':
-    BannerGrabApp = BannerGrab()
-    BannerGrabApp
+	def scan_crtsh(self, domain_name, proxy_address):
+		try:
+			url = "https://crt.sh/?q=%25." + domain_name
+			data = url_req.standart_request(url, proxy_address)
+			soup = BeautifulSoup( data, 'lxml')
+			subdomain_list = []
+			try:
+				table = soup.findAll('table')[2]
+				rows = table.find_all(['tr'])
+				for row in rows:
+					cells = row.find_all('td', limit=5)
+					if cells:
+						name = cells[3].text
+						# we don't need wildcard domain
+						if "*." not in name:
+							subdomain_list.append(name)
+
+				return list(set(subdomain_list))
+			except:
+				pass
+		except:
+			pass

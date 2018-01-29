@@ -1,6 +1,0 @@
-argparse
-dnspython
-requests
-texttable
-python-geoip-geolite2
-python-geoip
