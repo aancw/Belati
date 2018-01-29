@@ -67,15 +67,18 @@ class HarvestPublicDocument(object):
         # (?P<url>https?://[A-Za-z0-9\-\?&#_~@=\.\/%\[\]\+]+\.pdf)
         #  "(?P<url>https?://[^:]+\.%s)" % extension
         regex = "(?P<url>https?://[A-Za-z0-9\-\?&#_~@=\.\/%\[\]\+]+\.{})".format(extension)
-        data = re.findall(regex, data)
-        list_files_download = list(set(data))
-        total_files = str(len(list_files_download))
-        if total_files != "0":
-            log.console_log("{}[*] Found {} {} files!".format(G, total_files, extension.upper(), W) )
-            log.console_log("{}[*] Please wait, lemme download it for you ;) {}[NO PROXY] {}".format(G, Y, W))
-            for files_download in list_files_download:
-                log.no_console_log(files_download.split('/')[-1])
-                self.download_files(files_download, domain)
+        if type(data)==str:
+            data = re.findall(regex, data)
+            list_files_download = list(set(data))
+            total_files = str(len(list_files_download))
+            if total_files != "0":
+                log.console_log("{}[*] Found {} {} files!".format(G, total_files, extension.upper(), W) )
+                log.console_log("{}[*] Please wait, lemme download it for you ;) {}[NO PROXY] {}".format(G, Y, W))
+                for files_download in list_files_download:
+                    log.no_console_log(files_download.split('/')[-1])
+                    self.download_files(files_download, domain)
+        else:
+            log.console_log("{}[!] Error: Google probably now is blocking our requests{}".format(R,W))
 
     def download_files(self, url, folder_domain):
         filename = url.split('/')[-1]
