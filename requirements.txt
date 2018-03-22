@@ -18,6 +18,6 @@ python-whois
 futures
 django==1.11.6
 pyexifinfo
-cmd2
+cmd2==0.8.0
 tabulate
 dnsdumpster
