@@ -45,7 +45,7 @@ class SubdomainEnum(object):
 				for row in rows:
 					cells = row.find_all('td', limit=5)
 					if cells:
-						name = cells[3].text
+						name = cells[4].text
 						# we don't need wildcard domain
 						if "*." not in name:
 							subdomain_list.append(name)
