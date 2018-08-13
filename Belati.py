@@ -20,10 +20,10 @@
 
 
 # We need to check Dependency first
-#from plugins.dep_check import DepCheck
+from plugins.dep_check import DepCheck
 
-#dep_check = DepCheck()
-#dep_check.check_dependency()
+dep_check = DepCheck()
+dep_check.check_dependency()
 
 import argparse
 import datetime
