@@ -24,12 +24,12 @@
 
 import sys, os
 import shlex, subprocess
-from logger import Logger
-from config import Config
-from distutils.version import LooseVersion, StrictVersion
-from urlparse import urlparse
-from url_request import URLRequest
-from util import Util
+from .logger import Logger
+from .config import Config
+from pkg_resources import parse_version
+from urllib.parse import urlparse
+from .url_request import URLRequest
+from .util import Util
 
 # Console color
 G = '\033[92m'  # green
@@ -54,28 +54,35 @@ class Updater(object):
             log.console_log("{}[+] Checking Network Connection... {} {}".format(G, "OK" if connection_status else "FAILED" ,W))
 
             if not connection_status:
-    	    	log.console_log("{}[-] Belati can't be used in Offline Mode. Please check your network connection {}".format(R, W)) 
-    	    	sys.exit()
+                log.console_log("{}[-] Belati can't be used in Offline Mode. Please check your network connection {}".format(R, W))
+                sys.exit()
             else:
                 log.console_log("{}[+] Checking Version Update for Belati... {}".format(G, W))
-                
-                remote_version = str(url_req.just_url_open(remote_version_url, "").read())
-                
-                if self.update_version(version, remote_version):
-                    log.console_log("{}[+] Update is available for version {}{}".format(G, remote_version, W))
-                    log.console_log("{}[*] Updating from master repo")
-                    self.do_update()
-                    self.migrate_db()
-            	else:
-            		log.console_log("{}[+] Belati version is uptodate \m/{}".format(Y, W))
+
+                try:
+                    response = url_req.get(remote_version_url, "")
+                    data = response.read().decode()
+                    remote_version = data
+
+                    if self.update_version(version, remote_version):
+                        log.console_log("{}[+] Update is available for version {}{}".format(G, remote_version, W))
+                        log.console("{}[+] CHANGELOG: https://github.com/aancw/Belati/CHANGELOG.md {}".format(G, remote_version, W))
+                        log.console_log("[*] Updating from master repo")
+                        self.do_update()
+                        self.migrate_db()
+                    else:
+                        log.console_log("{}[+] Belati version is uptodate \m/{}".format(Y, W))
+                except:
+                    pass
 
     def update_version(self, local_version, remote_version):
-    	return LooseVersion(util.clean_version_string(local_version)) < LooseVersion(util.clean_version_string(remote_version))
+        return parse_version(util.clean_version_string(local_version)) < parse_version(util.clean_version_string(remote_version))
 
     def do_update(self):
-    	util.do_command("git", "pull")
+        util.do_command("git", "pull")
 
     def migrate_db(self):
+        log.console_log("{}[+] Make database migration{}".format(Y, W))
         py_bin = conf.get_config("Environment", "py_bin")
         command = "{} web/manage.py".format(py_bin)
         util.do_command(command,"makemigrations web")

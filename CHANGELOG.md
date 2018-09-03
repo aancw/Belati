@@ -49,3 +49,14 @@ v0.2.4
 - Update Dependencies Checker, more accurate with module version comparison 
 - Migrating sublist3r to manual checking dnsdumpster, crtsh and other service will coming soon
 - Fixing bug for stability and improvement
+
+v0.2.5
+
+- Redesign Web UI
+- Refactoring to python3
+- Change for updater system
+- fixed hang command in python3 because readline will result bytes instead of string
+- Discountinued support for python 2
+- Deleting pywhois library and using upstream instead
+- Recoding for (suck) URLRequest function and repetation
+- Fix wrong domain check

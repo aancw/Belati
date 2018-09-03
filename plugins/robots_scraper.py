@@ -20,7 +20,7 @@
 
 # This file is part of Belati project
 
-from url_request import URLRequest
+from .url_request import URLRequest
 
 url_req = URLRequest()
 
@@ -28,9 +28,11 @@ class RobotsScraper(object):
     def check_robots(self, domain_name, proxy_address):
         try:
             url_request = "{}/robots.txt".format(domain_name)
-            data = url_req.just_url_open(url_request, proxy_address)
+            response = url_req.get(url_request, proxy_address)
+            data = response.read().decode()
+            
             if data is not "" and data is not "notexist":
-            	# We need to check if file is valid, no redirect, no reload, or something
+                # We need to check if file is valid, no redirect, no reload, or something
                 if data.getcode() == 200 and data.getcode() != 302 and url_request in data.geturl() :
                     return data
         except:

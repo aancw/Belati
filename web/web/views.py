@@ -1,13 +1,12 @@
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 
-from models import Projects, MainDomainResults, SubdomainResults, MailHarvestResults, DocResults, LinkedinCompanyInfo, LinkedinCompanyEmployees
+from .models import Projects, MainDomainResults, SubdomainResults, MailHarvestResults, DocResults, LinkedinCompanyInfo, LinkedinCompanyEmployees
 
 def index_page(request):
     project_list = Projects.objects.all().order_by('project_id')
     return render_to_response('index.html',
                           {'project_data': project_list})
-
 
 def view_projects(request, id):
     project_list = Projects.objects.filter(project_id=id)
@@ -22,3 +21,6 @@ def view_projects(request, id):
 
 def about_page(request):
     return render_to_response('about.html')
+
+def login_page(request):
+    return render_to_response('login.html')

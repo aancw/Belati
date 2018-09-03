@@ -24,34 +24,36 @@ import sys
 
 from bs4 import BeautifulSoup
 from dnsdumpster.DNSDumpsterAPI import DNSDumpsterAPI
-from url_request import URLRequest
+from .url_request import URLRequest
 
 url_req = URLRequest()
 
 class SubdomainEnum(object):
-	def scan_dnsdumpster(self, domain_name):
-		results = DNSDumpsterAPI().search(domain_name)
-		return results
+    def scan_dnsdumpster(self, domain_name):
+        results = DNSDumpsterAPI().search(domain_name)
+        return results
 
-	def scan_crtsh(self, domain_name, proxy_address):
-		try:
-			url = "https://crt.sh/?q=%25." + domain_name
-			data = url_req.standart_request(url, proxy_address)
-			soup = BeautifulSoup( data, 'lxml')
-			subdomain_list = []
-			try:
-				table = soup.findAll('table')[2]
-				rows = table.find_all(['tr'])
-				for row in rows:
-					cells = row.find_all('td', limit=5)
-					if cells:
-						name = cells[4].text
-						# we don't need wildcard domain
-						if "*." not in name:
-							subdomain_list.append(name)
+    def scan_crtsh(self, domain_name, proxy_address):
+        try:
+            url = "https://crt.sh/?q=%25." + domain_name
+            response = url_req.get(url, proxy_address)
+            data = response.read().decode()
+            
+            soup = BeautifulSoup( data, 'lxml')
+            subdomain_list = []
+            try:
+                table = soup.findAll('table')[2]
+                rows = table.find_all(['tr'])
+                for row in rows:
+                    cells = row.find_all('td', limit=5)
+                    if cells:
+                        name = cells[4].text
+                        # we don't need wildcard domain
+                        if "*." not in name:
+                            subdomain_list.append(name)
 
-				return list(set(subdomain_list))
-			except:
-				pass
-		except:
-			pass
+                return list(set(subdomain_list))
+            except:
+                pass
+        except:
+            pass

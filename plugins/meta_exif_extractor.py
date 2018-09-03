@@ -24,12 +24,11 @@ import pyexifinfo as p
 import json
 
 class MetaExifExtractor(object):
-	def extract_json(self, filename):
-		data = p.get_json(filename)
-		json_data = json.dumps(data, sort_keys=True, indent=4, separators=(',', ': '))
-		return json_data
+    def extract_json(self, filename):
+        data = p.get_json(filename)
+        json_data = json.dumps(data, sort_keys=True, indent=4, separators=(',', ': '))
+        return json_data
 
-	def extract_xml(self, filename):
-		data = p.get_xml(filename)
-		return data	
-
+    def extract_xml(self, filename):
+        data = p.get_xml(filename)
+        return data

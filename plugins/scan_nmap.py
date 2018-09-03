@@ -20,7 +20,7 @@
 
 # This file is part of Belati project
 
-from logger import Logger
+from .logger import Logger
 import shlex, subprocess
 
 log = Logger()

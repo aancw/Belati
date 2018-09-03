@@ -21,7 +21,7 @@
 # This file is part of Belati project
 
 import sys, os, operator, pkg_resources
-from logger import Logger
+from .logger import Logger
 
 # Console color
 G = '\033[92m'  # green
@@ -55,8 +55,8 @@ class DepCheck(object):
         with open('requirements.txt') as f:
             list_deps = f.read().splitlines()
 
-	dists = [d for d in pkg_resources.working_set]
-	pip_list = sorted([(i.key) for i in dists])
+        dists = [d for d in pkg_resources.working_set]
+        pip_list = sorted([(i.key) for i in dists])
         #pip_list = sorted([(i.key) for i in pip.get_installed_distributions()])
 
         for req_dep in list_deps:
@@ -72,7 +72,7 @@ class DepCheck(object):
                         if self.get_truth(installed_ver, c, pkg[1]):
                             break
                         else:
-                            missing_deps.append(req_dep)                            
+                            missing_deps.append(req_dep)
                 else:
                     if req_dep not in pip_list:
                         # Why this package is not in get_installed_distributions ?

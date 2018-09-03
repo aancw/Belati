@@ -21,14 +21,14 @@
 # This file is part of Belati project
 
 import re, os, errno
-import urllib
-from database import Database
-from logger import Logger
+import urllib.request, urllib.parse, urllib.error
+from .database import Database
+from .logger import Logger
 from tqdm import tqdm
 import requests
-from url_request import URLRequest
-from meta_exif_extractor import MetaExifExtractor
-from util import Util
+from .url_request import URLRequest
+from .meta_exif_extractor import MetaExifExtractor
+from .util import Util
 
 # Console color
 G = '\033[92m'  # green
@@ -63,7 +63,8 @@ class HarvestPublicDocument(object):
         total_files = 0
         url = 'https://www.google.com/search?q=site:' + domain + '%20ext:' + extension + '&filter=0&num=200'
         try:
-            data = url_req.standart_request(url, proxy_address)
+            response = url_req.get(url, proxy_address)
+            data = response.read().decode()
             # Re<url>https?:\/\/[A-Za-z0-9\-\?&#_~@=\.\/%\[\]\+]+.pdf
             # (?P<url>https?://[A-Za-z0-9\-\?&#_~@=\.\/%\[\]\+]+\.pdf)
             #  "(?P<url>https?://[^:]+\.%s)" % extension
@@ -98,7 +99,7 @@ class HarvestPublicDocument(object):
 
         with tqdm(unit='B', unit_scale=True, miniters=1,desc=filename) as t:
             try:
-                urllib.urlretrieve(url, filename=full_filename,reporthook=self.my_hook(t), data=None)
+                urllib.request.urlretrieve(url, filename=full_filename,reporthook=self.my_hook(t), data=None)
             except:
                 pass
 
@@ -106,34 +107,34 @@ class HarvestPublicDocument(object):
         self.db.insert_public_doc(self.project_id, str(os.path.splitext(filename)[1]), str(url), str(full_filename), str(full_filename_location), str(meta_exif_json))
 
     def my_hook(self,t):
-      """
-      Wraps tqdm instance. Don't forget to close() or __exit__()
-      the tqdm instance once you're done with it (easiest using `with` syntax).
-
-      Example
-      -------
-
-      >>> with tqdm(...) as t:
-      ...     reporthook = my_hook(t)
-      ...     urllib.urlretrieve(..., reporthook=reporthook)
-
-      """
-      last_b = [0]
-
-      def inner(b=1, bsize=1, tsize=None):
         """
-        b  : int, optional
-            Number of blocks just transferred [default: 1].
-        bsize  : int, optional
-            Size of each block (in tqdm units) [default: 1].
-        tsize  : int, optional
-            Total size (in tqdm units). If [default: None] remains unchanged.
+        Wraps tqdm instance. Don't forget to close() or __exit__()
+        the tqdm instance once you're done with it (easiest using `with` syntax).
+
+        Example
+        -------
+
+        >>> with tqdm(...) as t:
+        ...     reporthook = my_hook(t)
+        ...     urllib.urlretrieve(..., reporthook=reporthook)
+
         """
-        if tsize is not None:
-            t.total = tsize
-        t.update((b - last_b[0]) * bsize)
-        last_b[0] = b
-      return inner
+        last_b = [0]
+
+        def inner(b=1, bsize=1, tsize=None):
+            """
+            b  : int, optional
+                Number of blocks just transferred [default: 1].
+            bsize  : int, optional
+                Size of each block (in tqdm units) [default: 1].
+            tsize  : int, optional
+                Total size (in tqdm units). If [default: None] remains unchanged.
+            """
+            if tsize is not None:
+                t.total = tsize
+            t.update((b - last_b[0]) * bsize)
+            last_b[0] = b
+        return inner
 
 if __name__ == '__main__':
     HarvestPublicDocumentApp = HarvestPublicDocument()

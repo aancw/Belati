@@ -22,10 +22,10 @@
 
 import sys, socket
 import ssl
-import urllib2, httplib
-from user_agents import UserAgents
-from urlparse import urlparse
-from logger import Logger
+import urllib.request, urllib.error, urllib.parse, http.client
+from .user_agents import UserAgents
+from urllib.parse import urlparse
+from .logger import Logger
 import random
 
 # Console color
@@ -39,7 +39,13 @@ log = Logger()
 ua = UserAgents()
 
 class URLRequest(object):
-    def standart_request(self, url_request, proxy_address, user_agents=None):
+    def get(self, url_request, proxy_address, user_agents=None, mode=0):
+        ''' request mode
+        0: standart(plus http code)
+        1: just check
+
+        '''
+
         try:
             if type(proxy_address) is list:
                 # Get random proxy from list
@@ -58,79 +64,25 @@ class URLRequest(object):
             parse = urlparse(proxy_address_fix)
             proxy_scheme = parse.scheme
             proxy = str(parse.hostname) + ':' + str(parse.port)
-            proxy_handler = urllib2.ProxyHandler({ proxy_scheme: proxy})
-            opener = urllib2.build_opener(proxy_handler)
+            proxy_handler = urllib.request.ProxyHandler({ proxy_scheme: proxy})
+            opener = urllib.request.build_opener(proxy_handler)
             opener.addheaders = [('User-agent', user_agent_fix )]
-            urllib2.install_opener(opener)
-            req = urllib2.Request(url_request)
-            data = urllib2.urlopen(req).read()
+            urllib.request.install_opener(opener)
+            req = urllib.request.Request(url_request)
+            if mode == 0:
+                data = urllib.request.urlopen(req)
+            elif mode == 1:
+                data = urllib.request.urlopen(req, timeout=25)
             return data
-        except urllib2.HTTPError, e:
-            log.console_log('Error code: {}'.format( str(e.code)))
+        except urllib.error.HTTPError as e:
             return e.code
-        except Exception, detail:
-            log.console_log('ERROR {}'.format( str(detail)))
-            return 1
-
-    def header_info(self, url_request, proxy_address):
-        try:
-            if type(proxy_address) is list:
-                # Get random proxy from list
-                proxy_address_fix = random.choice(proxy_address)
-            else:
-                proxy_address_fix = proxy_address
-
-            if proxy_address is not "":
-                log.console_log("{}[*] Using Proxy Address : {}{}".format(Y, proxy_address_fix, W))
-
-            parse = urlparse(proxy_address_fix)
-            proxy_scheme = parse.scheme
-            proxy = str(parse.hostname) + ':' + str(parse.port)
-            proxy_handler = urllib2.ProxyHandler({ proxy_scheme: proxy})
-            opener = urllib2.build_opener(proxy_handler)
-            opener.addheaders = [('User-agent', ua.get_user_agent() )]
-            urllib2.install_opener(opener)
-            req = urllib2.Request(url_request)
-            data = urllib2.urlopen(req).info()
-            return data
-        except urllib2.HTTPError, e:
-            log.console_log('Error code: {}'.format( str(e.code)))
-            return e.code
-        except Exception, detail:
-            log.console_log('ERROR {}'.format( str(detail)))
-            return 1
-        except httplib.BadStatusLine:
+        except urllib.error.URLError as e:
+            return e.reason
+        except Exception as detail:
             pass
-
-    def just_url_open(self, url_request, proxy_address):
-        try:
-            if type(proxy_address) is list:
-                # Get random proxy from list
-                proxy_address_fix = random.choice(proxy_address)
-            else:
-                proxy_address_fix = proxy_address
-
-            if proxy_address is not "":
-                log.console_log("{}[*] Using Proxy Address : {}{}".format(Y, proxy_address_fix, W))
-
-            parse = urlparse(proxy_address_fix)
-            proxy_scheme = parse.scheme
-            proxy = str(parse.hostname) + ':' + str(parse.port)
-            proxy_handler = urllib2.ProxyHandler({ proxy_scheme: proxy})
-            opener = urllib2.build_opener(proxy_handler)
-            opener.addheaders = [('User-agent', ua.get_user_agent() )]
-            urllib2.install_opener(opener)
-            req = urllib2.Request(url_request)
-            data = urllib2.urlopen(req, timeout=25)
-            return data
-        except urllib2.HTTPError, e:
-                return e.code
-    	except urllib2.URLError, e:
-			if str(e.reason) == "[Errno -2] Name or service not known":
-				log.console_log("Not EXIST!")
-				log.console_log("Check your internet connection or check your target domain")
-				return "notexist"
-
+        except http.client.BadStatusLine:
+            pass
+            
     def ssl_checker(self, domain):
         domain_fix = "https://{}".format(domain)
 
@@ -138,16 +90,16 @@ class URLRequest(object):
             # Skip SSL Verification Check!
             # https://stackoverflow.com/questions/27835619/ssl-certificate-verify-failed-error
             gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)  # Only for gangstars
-            data = urllib2.urlopen("https://{}".format(domain), timeout=25, context=gcontext)
+            data = urllib.request.urlopen("https://{}".format(domain), timeout=25, context=gcontext)
             if "ERROR" in data or "Errno" in data:
                 domain_fix = "http://{}".format(domain)
-        except urllib2.HTTPError, e:
+        except urllib.error.HTTPError as e:
             pass
-        except urllib2.URLError, e:
+        except urllib.error.URLError as e:
             domain_fix = "http://{}".format(domain)
         except ssl.SSLError as e:
             domain_fix = "http://{}".format(domain)
-        except httplib.BadStatusLine:
+        except http.client.BadStatusLine:
             domain_fix = "http://{}".format(domain)
 
         return domain_fix

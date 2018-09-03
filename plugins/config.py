@@ -21,9 +21,9 @@
 # This file is part of Belati project
 
 import sys, os, errno
-import ConfigParser
-from logger import Logger
-from util import Util
+import configparser
+from .logger import Logger
+from .util import Util
 
 # Console color
 G = '\033[92m'  # green
@@ -33,7 +33,7 @@ R = '\033[91m'  # red
 W = '\033[0m'   # white
 
 log = Logger()
-config = ConfigParser.ConfigParser()
+config = configparser.ConfigParser()
 util = Util()
 
 class Config(object):
@@ -56,7 +56,7 @@ class Config(object):
     def set_config(self, conf_section, conf_key, conf_value):
         config.read(self.config_file)
         config.set(conf_section, conf_key, conf_value)
-        with open(self.config_file, "wb") as conf_file:
+        with open(self.config_file, "w") as conf_file:
             config.write(conf_file)
 
     def init_config_file(self):
@@ -74,10 +74,15 @@ class Config(object):
             pass
         else:
             config.add_section("Environment")
-        
-        log.console_log("{} Setting Current Directory to {} {}".format(Y, util.get_current_work_dir(), W))   
 
-        python_binary = raw_input("\nPlease enter Python v2.x Binary name [python]:") or "python"
+        log.console_log("{} Setting Current Directory to {} {}".format(Y, util.get_current_work_dir(), W))
+
+        python_binary = ""
+        
+        try:
+            python_binary = eval(input("\nPlease enter Python v3.x Binary name, enter to leave default [python]:"))
+        except SyntaxError:
+            python_binary = "python" 
 
         self.set_config("Environment", "py_bin", python_binary)
         self.set_config("Environment", "curr_dir", util.get_current_work_dir())

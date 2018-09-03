@@ -23,6 +23,6 @@
 import json
 
 class JsonBeautifier(object):
-	def beautifier(self, json_data):
-		parsed = json.loads(json_data)
-		return json.dumps(parsed, indent=4, sort_keys=True)
+    def beautifier(self, json_data):
+        parsed = json.loads(json_data)
+        return json.dumps(parsed, indent=4, sort_keys=True)

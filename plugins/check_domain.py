@@ -20,32 +20,33 @@
 
 # This file is part of Belati project
 
-import sys
-from lib.pywhois import whois
-from url_request import URLRequest
+import sys, socket
+import whois
+from .url_request import URLRequest
 
 url_req = URLRequest()
 
 class CheckDomain(object):
-	def domain_checker(self, domain_name, proxy_address):
-		try:
-			data = url_req.just_url_open(domain_name, proxy_address)
-			if data is not "" and data is not "notexist" and not "ERROR" in data:
-				return "OK!"
-		except:
-			return "NOT OK!"
+    def domain_checker(self, domain_name, proxy_address):
+        try:
+            socket.gethostbyname(domain_name)
+            return True
+        except socket.gaierror:
+            return False
+            
+    def alive_check(self, domain_name, proxy_address):
+        try:
+            response = url_req.get(url_req.ssl_checker(domain_name), proxy_address)
+            data = response
 
-	def alive_check(self, domain_name, proxy_address):
-		try:
-			data = url_req.just_url_open(domain_name, proxy_address)
-			if data is not "" and data is not "notexist" and not "ERROR" in data:
-				return "OK!"
-		except:
-			return "NOT OK!"
+            if data is not "" and data is not "notexist" and not "ERROR" in data:
+                return "OK!"
+        except:
+            return "NOT OK!"
 
-	def whois_domain(self, domain_name):
-		response = whois.whois(domain_name)
-		return response
+    def whois_domain(self, domain_name):
+        response = whois.whois(domain_name)
+        return response
 
 if __name__ == '__main__':
     CheckDomainApp = CheckDomain()

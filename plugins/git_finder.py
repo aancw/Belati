@@ -21,7 +21,7 @@
 # This file is part of Belati project
 
 import sys, re, time
-from url_request import URLRequest
+from .url_request import URLRequest
 
 # Console color
 G = '\033[92m'  # green
@@ -35,13 +35,14 @@ url_req = URLRequest()
 class GitFinder(object):
     def check_git(self, domain, proxy_address):
         try:
-            data = url_req.just_url_open(url_req.ssl_checker(domain) + "/.git/HEAD", proxy_address)
-            if data is not None and data is not "notexist":
-                decode_data = data.read(200).decode()
+            response = url_req.get(url_req.ssl_checker(domain) + "/.git/HEAD", proxy_address)
+            data = response.read().decode()
 
-                if not 'refs/heads' in decode_data:
-                    return False
+            if data is not None and data is not "notexist":
+                
+                if 'refs/heads' in data:
+                    True
                 else:
-                    return True
+                    response.getcode()
         except:
             pass

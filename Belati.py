@@ -18,6 +18,12 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# Check python compatibility
+import six, sys
+
+if six.PY2:
+            print("[-] Sorry, Belati is not supporting python 2 anymore. Please use python 3 instead. ")
+            sys.exit()
 
 # We need to check Dependency first
 from plugins.dep_check import DepCheck
@@ -27,8 +33,8 @@ dep_check.check_dependency()
 
 import argparse
 import datetime
-import urllib2
-import sys, signal, socket, re
+import urllib.request, urllib.error, urllib.parse
+import signal, socket, re
 import time
 import dns.resolver
 import tldextract
@@ -54,11 +60,11 @@ from plugins.svn_finder import SVNFinder
 from plugins.updater import Updater
 from plugins.url_request import URLRequest
 from plugins.util import Util
-from plugins.wappalyzer import Wappalyzer
+#from plugins.wappalyzer import Wappalyzer
 
 from lib.CheckMyUsername.check_my_username import CheckMyUsername
 from dnsknife.scanner import Scanner
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 from cmd2 import Cmd
 from tabulate import tabulate
@@ -100,7 +106,7 @@ class Belati(Cmd):
     def show_banner(self):
         banner = """
         {}
-
+        
          /$$$$$$$  /$$$$$$$$ /$$        /$$$$$$  /$$$$$$$$     .
         | $$__  $$| $$_____/| $$       /$$__  $$|__  $$__/    J:L
         | $$  \ $$| $$      | $$      | $$  \ $$   | $$       |:|
@@ -138,29 +144,29 @@ class Belati(Cmd):
         log.console_log(warning_message.format(R, W))
 
     def do_help(self, line):
-    	'print help message'
+        'print help message'
 
-    	print("\nCore commands")
-    	print("==============\n")
-    	print tabulate([["Name","Description"],
-    		["?", "Help menu"],
-    		["!", "Run OS Command"],
-    		["history", "Show command history"],
-    		["set", "Set parameters option value"],
-    		["show", "Display list available parameter option"],
-    		["start", "Start Automatic Scanning Belati"],
-    		["startws", "Start Web Server Only Mode"],
-    		["version", "Show application version number"],
-    		["quit", "Exit the application"]],
-			headers="firstrow")
+        print("\nCore commands")
+        print("==============\n")
+        print(tabulate([["Name","Description"],
+                ["?", "Help menu"],
+                ["!", "Run OS Command"],
+                ["history", "Show command history"],
+                ["set", "Set parameters option value"],
+                ["show", "Display list available parameter option"],
+                ["start", "Start Automatic Scanning Belati"],
+                ["startws", "Start Web Server Only Mode"],
+                ["version", "Show application version number"],
+                ["quit", "Exit the application"]],
+                        headers="firstrow"))
 
 
     def do_set(self, arg, opts=None):
-    	'''Set Variable for Belati parameters.\nUsage: set [option] [value]\n\nAvailable options:\ndomain, username, email, orgcomp, proxy, proxy_file'''
+        '''Set Variable for Belati parameters.\nUsage: set [option] [value]\n\nAvailable options:\ndomain, username, email, orgcomp, proxy, proxy_file'''
 
-    	if not arg:
-    		log.console_log('{} Set Variable for Belati parameters.\nUsage: set [option] [value]\n\nAvailable options:\ndomain, username, email, orgcomp, proxy, proxy_file {}'.format(W, W))
-    	else:
+        if not arg:
+            log.console_log('{} Set Variable for Belati parameters.\nUsage: set [option] [value]\n\nAvailable options:\ndomain, username, email, orgcomp, proxy, proxy_file {}'.format(W, W))
+        else:
             param = shlex.split(arg)
             key = param[0]
             value = param[1]
@@ -171,57 +177,57 @@ class Belati(Cmd):
                 log.console_log("Available parameters: domain, username, email, orgcomp, proxy, proxy_file")
 
     def do_show(self, arg, opts=None):
-    	'Show available parameter options'
-    	
-    	domain_val = self.parameters['domain'] if 'domain' in self.parameters else None
-    	orgcomp = self.parameters['orgcomp'] if 'orgcomp' in self.parameters else None
-     	email = self.parameters['email'] if 'email' in self.parameters else None
-     	username = self.parameters['username'] if 'username' in self.parameters else None
-     	proxy = self.parameters['proxy'] if 'proxy' in self.parameters else None
-     	proxy_file = self.parameters['proxy_file'] if 'proxy_file' in self.parameters else None
-     	org_val = ""
-    	arg = shlex.split(arg)
+        'Show available parameter options'
 
-    	if not arg:
-    		print("Please use command 'show options' to see list of option parameters")
+        domain_val = self.parameters['domain'] if 'domain' in self.parameters else None
+        orgcomp = self.parameters['orgcomp'] if 'orgcomp' in self.parameters else None
+        email = self.parameters['email'] if 'email' in self.parameters else None
+        username = self.parameters['username'] if 'username' in self.parameters else None
+        proxy = self.parameters['proxy'] if 'proxy' in self.parameters else None
+        proxy_file = self.parameters['proxy_file'] if 'proxy_file' in self.parameters else None
+        org_val = ""
+        arg = shlex.split(arg)
 
-    	elif arg[0] == "options":
-            print tabulate([["Name","Value", "Required", "Description"],
-    			["domain", domain_val, "Yes", "Domain name for OSINT"],
-    			["orgcomp", orgcomp, "Yes", "Organization/Company name for OSINT"],
-    			["email", email, "Optional", "Email address for OSINT"],
-    			["username", username, "Optional", "Username for OSINT"],
-    			["proxy", proxy, "Optional", "Proxy server(e.g http://127.0.0.1:8080)"],
-    			["proxy_file", proxy_file, "Optional", "Proxy file list location"]],
-    			headers="firstrow")
+        if not arg:
+            print("Please use command 'show options' to see list of option parameters")
+
+        elif arg[0] == "options":
+            print(tabulate([["Name","Value", "Required", "Description"],
+                        ["domain", domain_val, "Yes", "Domain name for OSINT"],
+                        ["orgcomp", orgcomp, "Yes", "Organization/Company name for OSINT"],
+                        ["email", email, "Optional", "Email address for OSINT"],
+                        ["username", username, "Optional", "Username for OSINT"],
+                        ["proxy", proxy, "Optional", "Proxy server(e.g http://127.0.0.1:8080)"],
+                        ["proxy_file", proxy_file, "Optional", "Proxy file list location"]],
+                        headers="firstrow"))
 
     def do_startws(self, line):
-    	'Start Belati in Web Server Only Mode'
-    	
-    	log.console_log("{}[*] Entering Web Server Only Mode...{}".format(Y,W))
-    	self.start_web_server()
-    	sys.exit()
+        'Start Belati in Web Server Only Mode'
+
+        log.console_log("{}[*] Entering Web Server Only Mode...{}".format(Y,W))
+        self.start_web_server()
+        sys.exit()
 
     def do_version(self, line):
-    	'Check current Belati version'
-    	
-    	log.console_log('{} {} by {}\n'.format(self.about.__name__, self.about.__version__, self.about.__author__))
-    	log.console_log('Project URL: {}'.format(self.about.__giturl__))
+        'Check current Belati version'
+
+        log.console_log('{} {} by {}\n'.format(self.about.__name__, self.about.__version__, self.about.__author__))
+        log.console_log('Project URL: {}'.format(self.about.__giturl__))
 
     def do_start(self, line):
-    	'Start automatic scanning'
-    	domain = self.parameters['domain'] if 'domain' in self.parameters else None
-    	orgcomp = self.parameters['orgcomp'] if 'orgcomp' in self.parameters else None
-     	email = self.parameters['email'] if 'email' in self.parameters else None
-     	username = self.parameters['username'] if 'username' in self.parameters else None
-     	proxy = self.parameters['proxy'] if 'proxy' in self.parameters else ''
-     	proxy_file = self.parameters['proxy_file'] if 'proxy_file' in self.parameters else ''
+        'Start automatic scanning'
+        domain = self.parameters['domain'] if 'domain' in self.parameters else None
+        orgcomp = self.parameters['orgcomp'] if 'orgcomp' in self.parameters else None
+        email = self.parameters['email'] if 'email' in self.parameters else None
+        username = self.parameters['username'] if 'username' in self.parameters else None
+        proxy = self.parameters['proxy'] if 'proxy' in self.parameters else ''
+        proxy_file = self.parameters['proxy_file'] if 'proxy_file' in self.parameters else ''
 
-    	if domain is None and orgcomp is None:
-    		log.console_log("{}[-] Please specify domain/organization {}".format(R,W))
-    		sys.exit()
-			
-		log.console_log("{}[*] Starting at: {} {}".format(Y, self.current_time , W))
+        if domain is None and orgcomp is None:
+            log.console_log("{}[-] Please specify domain/organization {}".format(R,W))
+            sys.exit()
+
+            log.console_log("{}[*] Starting at: {} {}".format(Y, self.current_time , W))
 
         self.updater = Updater()
         self.updater.check_update(self.about.__version__)
@@ -251,7 +257,7 @@ class Belati(Cmd):
 
             extract_domain = tldextract.extract(domain)
 
-            self.check_domain(self.url_req.ssl_checker(domain), proxy)
+            self.check_domain(domain, proxy)
             self.banner_grab(self.url_req.ssl_checker(domain), proxy)
 
             if extract_domain.subdomain == "":
@@ -287,8 +293,11 @@ class Belati(Cmd):
         check = CheckDomain()
 
         log.console_log(G + "{}[*] Checking Domain Availability... {}".format(G, W) , 0)
-        log.console_log(check.domain_checker(domain_name, proxy_address))
-        
+        if check.domain_checker(domain_name, proxy_address):
+            log.console_log("OK")
+        else:
+            log.console_log("Domain not exist or problem in network connection")    
+
         log.console_log("{}[*] Checking URL Alive... {}".format(G, W), 0)
         log.console_log(check.alive_check(domain_name, proxy_address))
 
@@ -334,7 +343,7 @@ class Belati(Cmd):
         for subdomain in subdomain_list:
             self.banner_grab(self.url_req.ssl_checker(subdomain), proxy)
             self.robots_scraper(self.url_req.ssl_checker(subdomain), proxy)
-            self.wappalyzing_webpage(subdomain)
+            #self.wappalyzing_webpage(subdomain)
             self.public_git_finder(subdomain, proxy)
             self.public_svn_finder(subdomain, proxy)
             try:
@@ -349,22 +358,22 @@ class Belati(Cmd):
         #for ipaddress in subdomain_ip_listFix:
             #self.common_service_check(ipaddress)
 
-        for ipaddress in subdomain_ip_listFix:
-            self.service_scanning(ipaddress)
+        #for ipaddress in subdomain_ip_listFix:
+            #self.service_scanning(ipaddress)
 
-    def wappalyzing_webpage(self, domain):
-        log.console_log("{}[*] Wapplyzing on domain {}{}".format(G, domain, W))
-        wappalyzing = Wappalyzer()
-        targeturl = self.url_req.ssl_checker(domain)
-        try:
-            data = wappalyzing.run_wappalyze(targeturl)
-            self.db.insert_wappalyzing(self.project_id, domain, data)
-        except urllib2.URLError as exc:
-            log.console_log('URL Error: {0}'.format(str(exc)))
-        except urllib2.HTTPError as exc:
-            log.console_log('HTTP Error: {0}'.format(str(exc)))
-        except Exception as exc:
-            log.console_log('Unknow error: {0}'.format(str(exc)))
+    # def wappalyzing_webpage(self, domain):
+    #     log.console_log("{}[*] Wapplyzing on domain {}{}".format(G, domain, W))
+    #     wappalyzing = Wappalyzer()
+    #     targeturl = self.url_req.ssl_checker(domain)
+    #     try:
+    #         data = wappalyzing.run_wappalyze(targeturl)
+    #         self.db.insert_wappalyzing(self.project_id, domain, data)
+    #     except urllib.error.URLError as exc:
+    #         log.console_log('URL Error: {0}'.format(str(exc)))
+    #     except urllib.error.HTTPError as exc:
+    #         log.console_log('HTTP Error: {0}'.format(str(exc)))
+    #     except Exception as exc:
+    #         log.console_log('Unknow error: {0}'.format(str(exc)))
 
     def service_scanning(self, ipaddress):
         scan_nm = ScanNmap()
@@ -394,8 +403,8 @@ class Belati(Cmd):
 
             self.db.update_dns_zone(self.project_id, domain_name, util.clean_list_string(ns_record_list), util.clean_list_string(mx_record_list))
 
-        except Exception, exc:
-            print("{}[*] No response from server... SKIP!{}".format(R, W))
+        except Exception as exc:
+            print(("{}[*] No response from server... SKIP!{}".format(R, W)))
 
     def harvest_email_search(self, domain_name, proxy_address):
         log.console_log("{}[*] Perfoming Email Harvest from Google Search...{}".format(G, W) )
@@ -405,7 +414,7 @@ class Belati(Cmd):
             log.console_log("{}[*] Found {} emails on domain {}{}".format(Y, str(len(harvest_result)), domain_name, W))
             log.console_log("{}{}{}".format(R, '\n'.join(harvest_result), W))
             self.db.insert_email_result(self.project_id, util.clean_list_string(harvest_result))
-        except Exception, exc:
+        except Exception as exc:
             log.console_log("{}[-] Not found or Unavailable. {}{}".format(R, str(harvest_result), W ))
 
     def harvest_email_pgp(self, domain_name, proxy_address):
@@ -416,7 +425,7 @@ class Belati(Cmd):
             log.console_log("{}[*] Found {} emails on domain {}{}".format(Y, str(len(harvest_result)), domain_name, W))
             log.console_log("{}{}{}".format(R, '\n'.join(harvest_result), W))
             self.db.update_pgp_email(self.project_id, util.clean_list_string(harvest_result))
-        except Exception, exc:
+        except Exception as exc:
             log.console_log("{}[-] Not found or Unavailable. {}{}".format(R, str(harvest_result), W ))
 
     def harvest_document(self, domain_name, proxy_address):
@@ -437,22 +446,22 @@ class Belati(Cmd):
             parse = urlparse(proxy_address)
             proxy_scheme = parse.scheme
             proxy = str(parse.hostname) + ':' + str(parse.port)
-            proxy_handler = urllib2.ProxyHandler({ proxy_scheme: proxy})
-            opener = urllib2.build_opener(proxy_handler)
+            proxy_handler = urllib.request.ProxyHandler({ proxy_scheme: proxy})
+            opener = urllib.request.build_opener(proxy_handler)
             opener.addheaders = [('User-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36')]
-            urllib2.install_opener(opener)
-            req = urllib2.Request(domain_check)
+            urllib.request.install_opener(opener)
+            req = urllib.request.Request(domain_check)
             start_time = time.time()
-            sock = urllib2.urlopen(req)
+            sock = urllib.request.urlopen(req)
             end_time = time.time()
             diff_time = round(end_time - start_time, 3)
             log.console_log(Y + "{}[+] {} OK! Response Time : {}s".format(Y, proxy_address, str(diff_time), W ))
             return 'ok'
-        except urllib2.HTTPError, e:
-            print('Error code: ' + str(e.code))
+        except urllib.error.HTTPError as e:
+            print(('Error code: ' + str(e.code)))
             return e.code
-        except Exception, detail:
-            print('ERROR ' +  str(detail))
+        except Exception as detail:
+            print(('ERROR ' +  str(detail)))
             return 1
 
     def check_multiple_proxy_status(self, file_location, domain_check):
@@ -460,14 +469,20 @@ class Belati(Cmd):
             text = [line.rstrip('\n') for line in data]
             for proxy in text:
                 if self.check_single_proxy_status(str(proxy), str(domain_check)) == 'ok':
-                     self.multiple_proxy_list.append(proxy)
+                    self.multiple_proxy_list.append(proxy)
 
     def public_git_finder(self, domain, proxy_address):
         log.console_log("{}[*] Checking Public GIT Directory on domain {}{}".format(G, domain, W))
         git_finder = GitFinder()
-        if git_finder.check_git(domain, proxy_address) == True:
+        result = git_finder.check_git(domain, proxy_address)
+        if result == True:
             log.console_log("{}[+] Gotcha! You are in luck, boy![{}/.git/]{}".format(Y, domain, W))
             self.db.update_git_finder(self.project_id, domain, "Yes")
+        elif result == 403:
+            log.console_log("{}[-] Forbidden. Please check manually [{}/.git/]{}".format(Y, domain, W))
+            self.db.update_git_finder(self.project_id, domain, "403")
+        elif result == 404:
+            pass           
 
     def public_svn_finder(self, domain, proxy_address):
         log.console_log("{}[*] Checking Public SVN Directory on domain {}{}".format(G, domain, W))

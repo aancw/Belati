@@ -22,9 +22,9 @@
 
 import re,sys
 from bs4 import BeautifulSoup
-from database import Database
-from logger import Logger
-from url_request import URLRequest
+from .database import Database
+from .logger import Logger
+from .url_request import URLRequest
 
 # Console color
 G = '\033[92m'  # green
@@ -44,52 +44,56 @@ class GatherCompany(object):
         comp_strip = company_name.replace(" ", "+")
         url = 'https://www.google.com/search?q="Current+*+{}+*"+site:linkedin.com&num=200'.format(comp_strip)
 
-        data = url_req.standart_request(url, proxy_address)
+        try:
+            response = url_req.get(url, proxy_address)
+            data = response.read().decode()
+            
+            soup = BeautifulSoup( data, 'html.parser')
+            company_linkedin_url_list = []
 
-        soup = BeautifulSoup( data, 'html.parser')
-        company_linkedin_url_list = []
+            #Getting all h3 tags with class 'r'
+            scrap_container = soup.find_all('div', class_='rc')
+            for rc in scrap_container:
+                soup2 = BeautifulSoup( str(rc), 'html.parser' )
+                url = soup2.find_all('h3', class_= 'r')
+                url_fix = re.findall(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', str(url))
+                linkedin_url = re.findall(r'(http[s]?://.*\.linkedin\.com/in/.*)', str(url_fix).strip("\'[]")) # filter only *.linked.com
+                company_linkedin_url = re.findall(r'(http[s]?://.*\.linkedin\.com/company/.*)', str(url_fix).strip("\'[]")) # filter only *.linked.com/company
+                job_title = soup2.find_all('div', class_='slp f')
+                url_tag = soup2.find_all("a")[0].string
 
-        #Getting all h3 tags with class 'r'
-        scrap_container = soup.find_all('div', class_='rc')
-        for rc in scrap_container:
-            soup2 = BeautifulSoup( str(rc), 'html.parser' )
-            url = soup2.find_all('h3', class_= 'r')
-            url_fix = re.findall(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', str(url))
-            linkedin_url = re.findall(r'(http[s]?://.*\.linkedin\.com/in/.*)', str(url_fix).strip("\'[]")) # filter only *.linked.com
-            company_linkedin_url = re.findall(r'(http[s]?://.*\.linkedin\.com/company/.*)', str(url_fix).strip("\'[]")) # filter only *.linked.com/company
-            job_title = soup2.find_all('div', class_='slp f')
-            url_tag = soup2.find_all("a")[0].string
+                # Check if URL is match with one of the string from company name(?)
+                if company_linkedin_url:
+                    is_contain_name = 0
+                    for x in company_name.split():
+                        if x in url_tag:
+                            is_contain_name = 1
+                            break
 
-            # Check if URL is match with one of the string from company name(?)
-            if company_linkedin_url:
-                is_contain_name = 0
-                for x in company_name.split():
-                    if x in url_tag:
-                        is_contain_name = 1
-                        break
+                    if is_contain_name == 1:
+                        company_linkedin_url_list.append(company_linkedin_url)
+                        self.company_id = self.db.insert_linkedin_company_info(self.project_id, str(company_name), str(company_linkedin_url), "Lorem ipsum")
 
-                if is_contain_name == 1:
-                    company_linkedin_url_list.append(company_linkedin_url)
-                    self.company_id = self.db.insert_linkedin_company_info(self.project_id, str(company_name), str(company_linkedin_url), "Lorem ipsum")
+                # Get data when linkedin url is like this : *.linkedin.com/in
+                if not linkedin_url:
+                    pass
+                else:
+                    name_result = re.sub('<[^<]+?>', '', str(rc.h3.a)) # strip all html tags like <em>
+                    job_title_result = re.sub('<[^<]+?>', '', str(job_title)) # strip all html tags like <em>
+                    name_fix = str(name_result.replace('| LinkedIn', ''))
+                    job_title_fix   = str(job_title_result.replace('\\u200e', ' ')).strip("\'[]")
+                    linkedin_url_fix = str(linkedin_url).strip("\'[]")
+                    log.console_log("{}[+] --------------------------------------------------- [+]{}".format(Y, W))
+                    log.console_log("Name: {}".format( name_fix ))
+                    log.console_log("Job Title: {}".format( job_title_fix ))
+                    log.console_log("Url: {}".format( linkedin_url_fix ))
+                    log.console_log("{}[+] --------------------------------------------------- [+]{}\n".format(Y, W))
 
-            # Get data when linkedin url is like this : *.linkedin.com/in
-            if not linkedin_url:
-                pass
-            else:
-                name_result = re.sub('<[^<]+?>', '', str(rc.h3.a)) # strip all html tags like <em>
-                job_title_result = re.sub('<[^<]+?>', '', str(job_title)) # strip all html tags like <em>
-                name_fix = str(name_result.replace('| LinkedIn', ''))
-                job_title_fix   = str(job_title_result.replace('\u200e', ' ')).strip("\'[]")
-                linkedin_url_fix = str(linkedin_url).strip("\'[]")
-                log.console_log("{}[+] --------------------------------------------------- [+]{}".format(Y, W))
-                log.console_log("Name: {}".format( name_fix ))
-                log.console_log("Job Title: {}".format( job_title_fix ))
-                log.console_log("Url: {}".format( linkedin_url_fix ))
-                log.console_log("{}[+] --------------------------------------------------- [+]{}\n".format(Y, W))
+                    self.db.insert_company_employees(self.project_id, name_fix, job_title_fix, linkedin_url_fix)
 
-                self.db.insert_company_employees(self.project_id, name_fix, job_title_fix, linkedin_url_fix)
-
-        log.console_log("\n\n{}[+] --------------------------------------------------- [+]{}".format(Y, W))
-        log.console_log("{}[+] Found LinkedIn Company URL: {}".format(Y, W))
-        for url in company_linkedin_url_list:
-            log.console_log("{} {} {}".format(Y, str(url), W))
+            log.console_log("\n\n{}[+] --------------------------------------------------- [+]{}".format(Y, W))
+            log.console_log("{}[+] Found LinkedIn Company URL: {}".format(Y, W))
+            for url in company_linkedin_url_list:
+                log.console_log("{} {} {}".format(Y, str(url), W))
+        except:
+            pass

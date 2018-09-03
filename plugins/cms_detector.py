@@ -20,21 +20,49 @@
 
 # This file is part of Belati project
 
-# This is part of MailHarvester and EMINGOO regex
-# Thanks to pantuts and maldevel
+# This script based on builtwith from Richard Penman
+# https://bitbucket.org/richardpenman/builtwith
 
-import sys, re, time
+import sys, re, time, json
 from .url_request import URLRequest
+from .util import Util
 
 url_req = URLRequest()
+util = Util()
 
-class HarvestEmail(object):
+class CMSDetector(object):
+	def __init__(self):
+
+		data = load_json_app()
+
+		techs = {}
+
+		# check URL
+	    for app_name, app_spec in data['apps'].items():
+	        if 'url' in app_spec:
+	            if contains(url, app_spec['url']):
+	                add_app(techs, app_name, app_spec)
+
+	        # download content
+	    if None in (headers, html):
+	        try:
+	            request = urllib2.Request(url, None, {'User-Agent': user_agent})
+	            if html:
+	                # already have HTML so just need to make HEAD request for headers
+	                request.get_method = lambda: 'HEAD'
+	            response = urllib2.urlopen(request)
+	            if headers is None:
+	                headers = response.headers
+	            if html is None:
+	                html = response.read()
+	        except Exception as e:
+	            print('Error:', e)
+
     def crawl_search(self, domain, proxy_address):
         url = 'https://www.google.com/search?num=200&start=0&filter=0&hl=en&q=@' + domain
         try:
-            response = url_req.get(url, proxy_address)
+            response = url_req.standart_request(url, proxy_address)
             data = response.read().decode()
-
             dataStrip = re.sub('<[^<]+?>', '', data) # strip all html tags like <em>
             dataStrip1 =  re.findall(r'[a-zA-Z0-9._+-]+@[a-zA-Z0-9._+-]+' + domain, dataStrip)
             dataStrip2 = re.findall(r'[a-zA-Z0-9._+-]+@' + domain, dataStrip)
@@ -44,20 +72,6 @@ class HarvestEmail(object):
         except:
             pass
 
-    def crawl_pgp_mit_edu(self, domain, proxy_address):
-        url = 'http://pgp.mit.edu:11371/pks/lookup?op=index&search=' + domain
-        try:
-            response = url_req.get(url, proxy_address, 'Googlebot/3.1 (+http://www.googlebot.com/bot.html)')
-            data = response.read().decode()
-
-            dataStrip = re.sub('<[^<]+?>', '', data) # strip all html tags like <em>
-            dataStrip1 =  re.findall(r'[a-zA-Z0-9._+-]+@[a-zA-Z0-9._+-]+' + domain, dataStrip)
-            dataStrip2 = re.findall(r'[a-zA-Z0-9._+-]+@' + domain, dataStrip)
-            dataEmail = set(dataStrip1 + dataStrip2)
-            return list(dataEmail)
-        except:
-            pass
-
-if __name__ == '__main__':
-    HarvestEmailApp = HarvestEmail()
-    HarvestEmailApp
+    def load_json_app():
+    	filename = '{}/plugins/data/apps.json'.format(util.get_current_work_dir())
+    	return json.load(open(filename))

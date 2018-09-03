@@ -21,15 +21,16 @@
 # This file is part of Belati project
 
 import sys
-from url_request import URLRequest
+from .url_request import URLRequest
 
 url_req = URLRequest()
 
 class BannerGrab(object):
     def show_banner(self, domain_name, proxy_address):
         try:
-            data = url_req.header_info(domain_name, proxy_address)
-            return data
+            response = url_req.get(domain_name, proxy_address)
+            headers = response.headers
+            return headers
         except:
             pass
 

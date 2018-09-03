@@ -11,13 +11,13 @@ validators
 tqdm
 tldextract
 fake-useragent
-python-wappalyzer
 future
 beautifulsoup4
 python-whois
 futures
-django==1.11.6
+django
 pyexifinfo
-cmd2==0.8.0
+cmd2
 tabulate
 dnsdumpster
+six

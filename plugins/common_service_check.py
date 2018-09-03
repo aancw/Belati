@@ -21,8 +21,8 @@
 # This file is part of Belati project
 
 import sys, socket, errno
-from logger import Logger
-from url_request import URLRequest
+from .logger import Logger
+from .url_request import URLRequest
 
 
 # Console color
@@ -51,10 +51,10 @@ class CommonServiceCheck(object):
                 elif port == 443:
                     data = url_req.header_info("https://" + host, "")
                 else:
-                    print("port :" + str(port) + " OPEN! " + s.recv(4096))
+                    print(("port :" + str(port) + " OPEN! " + s.recv(4096)))
             except socket.error as e:
                 if e.errno == errno.ECONNREFUSED or e.errno == 113:
                     pass
                 else:
-                    print("port :" + str(port) + str(e) + "closed")
+                    print(("port :" + str(port) + str(e) + "closed"))
             s.close()

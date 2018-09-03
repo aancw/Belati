@@ -21,7 +21,7 @@
 # This file is part of Belati project
 
 import sys, re, time
-from url_request import URLRequest
+from .url_request import URLRequest
 
 # Console color
 G = '\033[92m'  # green
@@ -35,11 +35,12 @@ url_req = URLRequest()
 class SVNFinder(object):
     def check_svn(self, domain, proxy_address):
         try:
-            data = url_req.just_url_open(url_req.ssl_checker(domain) + "/.svn/", proxy_address)
+            data = url_req.url_open_data(url_req.ssl_checker(domain) + "/.svn/", proxy_address)
+            data = response.read().decode()
 
             if data is not None and data is not "notexist":
                 if data == 403:
-                    return data
+                    return 403
                 if data.getcode() == 200 and data.getcode() != 302 and url_request in data.geturl():
                     return data.getcode()
         except:

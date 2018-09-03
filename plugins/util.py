@@ -22,12 +22,11 @@
 
 # All Utilities Function will be here ;)
 
-import sys, os
+import sys, os, six
 import shlex, subprocess
-from logger import Logger
+from .logger import Logger
 from distutils.version import LooseVersion, StrictVersion
-from urlparse import urlparse
-from url_request import URLRequest
+from urllib.parse import urlparse
 
 # Console color
 G = '\033[92m'  # green
@@ -37,43 +36,33 @@ R = '\033[91m'  # red
 W = '\033[0m'   # white
 
 log = Logger()
-url_req = URLRequest()
 
 class Util(object):
-    def check_python_version(self):
-	    if sys.version[:3] == "2.7" or "2" in sys.version[:3]:
-	        log.console_log("{}[*] Python version OK! {}{}".format(G, sys.version[:6], W))
-	    elif "3" in sys.version[:3]:
-	        log.console_log("{}[-] Nope. This system not yet compatible for Python 3!{}".format(Y, W))
-	        sys.exit()
-	    else:
-	        log.console_log("{}[-] Duh. Your python version too old for running this :({}".format(Y, W))
-	        sys.exit()
 
     def do_command(self, command, parameter):
-    	full_command = "{} {}".format(command, parameter)
+        full_command = "{} {}".format(command, parameter)
         process = subprocess.Popen(shlex.split(full_command), stdout=subprocess.PIPE)
         while True:
-            output = process.stdout.readline()
+            output = process.stdout.readline().decode()
             if output == '' and process.poll() is not None:
                 break
             if output:
                 log.console_log(output.strip())
         rc = process.poll()
         return rc
-	
+
     def clean_version_string(self, text):
-    	# strip v0.2.2-dev
-    	strip_dev = text.strip("-dev\n")
-    	return strip_dev
+        # strip v0.2.2-dev
+        strip_dev = text.strip("-dev\n")
+        return str(strip_dev)
 
     def get_current_work_dir(self):
-		return os.getcwd()
+        return os.getcwd()
 
     def clean_list_string(self, text):
-    	return str(", ".join(text))
-   
+        return str(", ".join(text))
+
     def strip_scheme(self, url):
-	    parsed = urlparse(url)
-	    scheme = "%s://" % parsed.scheme
-	    return parsed.geturl().replace(scheme, '', 1)
+        parsed = urlparse(url)
+        scheme = "%s://" % parsed.scheme
+        return parsed.geturl().replace(scheme, '', 1)

@@ -21,8 +21,8 @@
 # This file is part of Belati project
 
 from Wappalyzer import Wappalyzer, WebPage
-from user_agents import UserAgents
-from logger import Logger
+from .user_agents import UserAgents
+from .logger import Logger
 
 log = Logger()
 ua = UserAgents()

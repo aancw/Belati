@@ -1,1 +1,0 @@
-{"domain_name": "DIGG.COM", "expiration_date": "2010-02-20 00:00:00", "updated_date": "2007-03-13 00:00:00", "status": ["clientDeleteProhibited", "clientRenewProhibited", "clientTransferProhibited", "clientUpdateProhibited"], "creation_date": "2000-02-20 00:00:00"}

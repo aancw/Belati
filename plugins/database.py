@@ -22,8 +22,8 @@
 
 import sys, os, errno
 import sqlite3 as db
-from logger import Logger
-from config import Config
+from .logger import Logger
+from .config import Config
 
 # Console color
 G = '\033[92m'  # green
@@ -42,8 +42,8 @@ class Database(object):
         try:
             self.conn = db.connect(db_location)
             self.conn.text_factory = str
-        except db.Error, e:
-            print("Error: " +  str(e.args[0]))
+        except db.Error as e:
+            print(("Error: " +  str(e.args[0])))
             sys.exit()
 
     def create_new_project(self, project_domain, project_org, time):
