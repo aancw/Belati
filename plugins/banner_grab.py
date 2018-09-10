@@ -28,7 +28,7 @@ url_req = URLRequest()
 class BannerGrab(object):
     def show_banner(self, domain_name, proxy_address):
         try:
-            response = url_req.get(domain_name, proxy_address)
+            response = url_req.get(domain_name, proxy_address, "", 1)
             headers = response.headers
             return headers
         except:

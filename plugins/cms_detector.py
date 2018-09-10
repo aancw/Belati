@@ -23,7 +23,7 @@
 # This script based on builtwith from Richard Penman
 # https://bitbucket.org/richardpenman/builtwith
 
-import sys, re, time, json
+import sys, re, time, json, six
 from .url_request import URLRequest
 from .util import Util
 
@@ -32,46 +32,107 @@ util = Util()
 
 class CMSDetector(object):
 	def __init__(self):
+		self.data = self.load_json_app()
+		self.techs = {}
 
-		data = load_json_app()
-
-		techs = {}
+	def detect(self, url, proxy_address):
+		html = None
+		headers = None
 
 		# check URL
-	    for app_name, app_spec in data['apps'].items():
-	        if 'url' in app_spec:
-	            if contains(url, app_spec['url']):
-	                add_app(techs, app_name, app_spec)
+		for app_name, app_spec in self.data['apps'].items():
+			if 'url' in app_spec:
+				if self.contains(url, app_spec['url']):
+					self.add_app(self.techs, app_name, app_spec)
 
-	        # download content
-	    if None in (headers, html):
-	        try:
-	            request = urllib2.Request(url, None, {'User-Agent': user_agent})
-	            if html:
-	                # already have HTML so just need to make HEAD request for headers
-	                request.get_method = lambda: 'HEAD'
-	            response = urllib2.urlopen(request)
-	            if headers is None:
-	                headers = response.headers
-	            if html is None:
-	                html = response.read()
-	        except Exception as e:
-	            print('Error:', e)
+		try: 
+			response = url_req.get(url_req.ssl_checker(url), proxy_address)
+			http_data = response.read().decode()
+			headers = response.headers
+			html = http_data
+		except Exception as e:
+			print('Error:', e)
 
-    def crawl_search(self, domain, proxy_address):
-        url = 'https://www.google.com/search?num=200&start=0&filter=0&hl=en&q=@' + domain
-        try:
-            response = url_req.standart_request(url, proxy_address)
-            data = response.read().decode()
-            dataStrip = re.sub('<[^<]+?>', '', data) # strip all html tags like <em>
-            dataStrip1 =  re.findall(r'[a-zA-Z0-9._+-]+@[a-zA-Z0-9._+-]+' + domain, dataStrip)
-            dataStrip2 = re.findall(r'[a-zA-Z0-9._+-]+@' + domain, dataStrip)
-            dataEmail = set(dataStrip1 + dataStrip2)
-            dataFix = [x for x in dataEmail if not x.startswith('x22') and not x.startswith('3D') and not x.startswith('x3d') and not x.startswith('Cached') and not x.startswith('page')] # ignore email because bad parsing
-            return list(dataFix)
-        except:
-            pass
+		# check headers
+		if headers:
+			for app_name, app_spec in self.data['apps'].items():
+				if 'headers' in app_spec:
+					if self.contains_dict(headers, app_spec['headers']):
+						self.add_app(self.techs, app_name, app_spec)
+	    
+		# check html
+		if html:
+			for app_name, app_spec in self.data['apps'].items():
+				for key in 'html', 'script':
+					snippets = app_spec.get(key, [])
+					if not isinstance(snippets, list):
+						snippets = [snippets]
+					for snippet in snippets:
+						if self.contains(html, snippet):
+							self.add_app(self.techs, app_name, app_spec)
+							break
 
-    def load_json_app():
-    	filename = '{}/plugins/data/apps.json'.format(util.get_current_work_dir())
-    	return json.load(open(filename))
+        # check meta
+        # XXX add proper meta data parsing
+		if six.PY3 and isinstance(html, bytes):
+			html = html.decode()
+		metas = dict(re.compile('<meta[^>]*?name=[\'"]([^>]*?)[\'"][^>]*?content=[\'"]([^>]*?)[\'"][^>]*?>', re.IGNORECASE).findall(html))
+		for app_name, app_spec in self.data['apps'].items():
+			for name, content in app_spec.get('meta', {}).items():
+				if name in metas:
+					if self.contains(metas[name], content):
+						self.add_app(self.techs, app_name, app_spec)
+						break
+
+		return self.techs
+
+	def add_app(self, techs, app_name, app_spec):
+		"""Add this app to technology
+		"""
+		for category in self.get_categories(app_spec):
+			if category['name'] not in self.techs:
+				self.techs[category['name']] = []
+			if app_name not in self.techs[category['name']]:
+				self.techs[category['name']].append(app_name)
+				implies = app_spec.get('implies', [])
+				if not isinstance(implies, list):
+					implies = [implies]
+				for app_name in implies:
+					self.add_app(self.techs, app_name, self.data['apps'][app_name])
+	
+	def get_categories(self, app_spec):
+		"""Return category names for this app_spec
+		"""
+		return [self.data['categories'][str(c_id)] for c_id in app_spec['cats']]
+
+	def contains(self, v, regex):
+		"""Removes meta data from regex then checks for a regex match
+		"""
+		if six.PY3 and isinstance(v, bytes):
+			v = v.decode()
+
+		return re.compile(regex.split('\\;')[0], flags=re.IGNORECASE).search(v)
+
+
+	def contains_dict(self, d1, d2):
+		"""Takes 2 dictionaries
+		
+		Returns True if d1 contains all items in d2"""
+		for k2, v2 in d2.items():
+			v1 = d1.get(k2)
+			if v1:
+				if not self.contains(v1, v2):
+					return False
+			else:
+				return False
+		
+		return True
+
+	def load_json_app(self):
+		# data from https://github.com/AliasIO/Wappalyzer/
+		filename = '{}/plugins/data/apps.json'.format(util.get_current_work_dir())
+		json_data = json.load(open(filename))
+		return json_data
+
+if __name__ == '__main__':
+    cms = CMSDetector()

@@ -34,7 +34,7 @@ dep_check.check_dependency()
 import argparse
 import datetime
 import urllib.request, urllib.error, urllib.parse
-import signal, socket, re
+import signal, socket, re, json
 import time
 import dns.resolver
 import tldextract
@@ -44,6 +44,7 @@ from plugins.about_project import AboutProject
 from plugins.banner_grab import BannerGrab
 from plugins.check_domain import CheckDomain
 from plugins.config import Config
+from plugins.cms_detector import CMSDetector
 from plugins.common_service_check import CommonServiceCheck
 from plugins.database import Database
 from plugins.gather_company import GatherCompany
@@ -344,6 +345,7 @@ class Belati(Cmd):
             self.banner_grab(self.url_req.ssl_checker(subdomain), proxy)
             self.robots_scraper(self.url_req.ssl_checker(subdomain), proxy)
             #self.wappalyzing_webpage(subdomain)
+            self.detect_cms(subdomain, proxy)
             self.public_git_finder(subdomain, proxy)
             self.public_svn_finder(subdomain, proxy)
             try:
@@ -368,12 +370,26 @@ class Belati(Cmd):
     #     try:
     #         data = wappalyzing.run_wappalyze(targeturl)
     #         self.db.insert_wappalyzing(self.project_id, domain, data)
-    #     except urllib.error.URLError as exc:
-    #         log.console_log('URL Error: {0}'.format(str(exc)))
-    #     except urllib.error.HTTPError as exc:
-    #         log.console_log('HTTP Error: {0}'.format(str(exc)))
-    #     except Exception as exc:
-    #         log.console_log('Unknow error: {0}'.format(str(exc)))
+        # except urllib.error.URLError as exc:
+        #     log.console_log('URL Error: {0}'.format(str(exc)))
+        # except urllib.error.HTTPError as exc:
+        #     log.console_log('HTTP Error: {0}'.format(str(exc)))
+        # except Exception as exc:
+        #     log.console_log('Unknow error: {0}'.format(str(exc)))
+
+    def detect_cms(self, domain, proxy):
+        log.console_log("{}[*] Detecting CMS & Technology from domain {}{}".format(G, domain, W))
+        cms_detector = CMSDetector()
+        try:
+            data = cms_detector.detect(domain, proxy)
+            log.console_log(json.dumps(data, indent=4, sort_keys=True))
+            self.db.insert_wappalyzing(self.project_id, domain, str(data))
+        except urllib.error.URLError as exc:
+            log.console_log('URL Error: {0}'.format(str(exc)))
+        except urllib.error.HTTPError as exc:
+            log.console_log('HTTP Error: {0}'.format(str(exc)))
+        except Exception as exc:
+            log.console_log('Unknow error: {0}'.format(str(exc)))        
 
     def service_scanning(self, ipaddress):
         scan_nm = ScanNmap()

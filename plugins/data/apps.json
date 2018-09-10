@@ -7353,9 +7353,9 @@
         57
       ],
       "html": [
-				"powered by <a href=\"[^>]+getpelican\\.com",
-				"powered by <a href=\"https?://pelican\\.notmyidea\\.org"
-			],
+        "powered by <a href=\"[^>]+getpelican\\.com",
+        "powered by <a href=\"https?://pelican\\.notmyidea\\.org"
+      ],
       "icon": "pelican.png",
       "implies": "Python",
       "website": "https://blog.getpelican.com/"
@@ -12248,20 +12248,20 @@
         16
       ],
       "html": [
-				"<div[^>]+id=\"recaptcha_image",
-				"<link[^>]+recaptcha",
-				"<div[^>]+class=\"g-recaptcha\""
-			],
+        "<div[^>]+id=\"recaptcha_image",
+        "<link[^>]+recaptcha",
+        "<div[^>]+class=\"g-recaptcha\""
+      ],
       "icon": "reCAPTCHA.png",
       "js": {
         "Recaptcha": "",
         "recaptcha": ""
       },
       "script": [
-				"api-secure\\.recaptcha\\.net",
-				"recaptcha_ajax\\.js",
-				"/recaptcha/api\\.js"
-			],
+        "api-secure\\.recaptcha\\.net",
+        "recaptcha_ajax\\.js",
+        "/recaptcha/api\\.js"
+      ],
       "website": "https://www.google.com/recaptcha/"
     },
     "sIFR": {

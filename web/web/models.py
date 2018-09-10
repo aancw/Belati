@@ -5,7 +5,7 @@
 #   * Make sure each ForeignKey has `on_delete` set to the desired behavior.
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
-from __future__ import unicode_literals
+
 
 from django.db import models
 
@@ -138,7 +138,7 @@ class DocResults(models.Model):
     doc_full_location = models.TextField(blank=True, null=True)
     doc_meta_exif = models.TextField(blank=True, null=True)
     doc_author = models.TextField(blank=True, null=True)
-    
+
     class Meta:
         managed = True
         db_table = 'doc_results'

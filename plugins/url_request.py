@@ -72,7 +72,7 @@ class URLRequest(object):
             if mode == 0:
                 data = urllib.request.urlopen(req)
             elif mode == 1:
-                data = urllib.request.urlopen(req, timeout=25)
+                data = urllib.request.urlopen(req, timeout=15)
             return data
         except urllib.error.HTTPError as e:
             return e.code

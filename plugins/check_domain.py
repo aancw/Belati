@@ -36,7 +36,7 @@ class CheckDomain(object):
             
     def alive_check(self, domain_name, proxy_address):
         try:
-            response = url_req.get(url_req.ssl_checker(domain_name), proxy_address)
+            response = url_req.get(url_req.ssl_checker(domain_name), proxy_address, "",  1)
             data = response
 
             if data is not "" and data is not "notexist" and not "ERROR" in data:

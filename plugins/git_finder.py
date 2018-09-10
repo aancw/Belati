@@ -35,7 +35,7 @@ url_req = URLRequest()
 class GitFinder(object):
     def check_git(self, domain, proxy_address):
         try:
-            response = url_req.get(url_req.ssl_checker(domain) + "/.git/HEAD", proxy_address)
+            response = url_req.get(url_req.ssl_checker(domain) + "/.git/HEAD", proxy_address, "", 1)
             data = response.read().decode()
 
             if data is not None and data is not "notexist":

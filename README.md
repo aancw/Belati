@@ -17,7 +17,7 @@ Belati is tool for Collecting Public Data & Public Document from Website and oth
 
 ## Current Version
 
-v0.2.4
+v0.2.5
 
 ## Belati In Action
 
@@ -78,7 +78,7 @@ git clone https://github.com/aancw/Belati.git
 cd Belati
 git submodule update --init --recursive --remote
 pip install --upgrade pip
-pip install -r requirements.txt #please use pip with python v2
+pip install -r requirements.txt #please use pip with python v3
 sudo su
 python Belati.py --help
 ```
@@ -119,7 +119,7 @@ For more info, please refer to this guide: https://github.com/espi0n/Dockerfiles
 
 ## Python Requirements
 
-This tool not compatible with Python 3. I need to migrate this later. So use python v2.7 instead!
+I'm migrating this project to python 3 and no longer support for python 2.
 
 ## Why Need Root Privilege?
 
@@ -212,6 +212,8 @@ Please see [CONTRIBUTORS.md](https://github.com/aancw/Belati/blob/master/CONTRIB
 ## Thanks To
 
 Thanks to PyWhois Library, Sublist3r, MailHarvester, Emingoo for being part of my code. Also thanks to Hispagatos, Infosec-ninjas, eCHo, RNDC( Research and development center ) and all other people who are inspiring this project :)
+
+Thanks to [Richard Penman](https://bitbucket.org/richardpenman/builtwith)for his awesome builtwith code. 
 
 ## Publications
 

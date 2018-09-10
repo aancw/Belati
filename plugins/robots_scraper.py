@@ -28,7 +28,7 @@ class RobotsScraper(object):
     def check_robots(self, domain_name, proxy_address):
         try:
             url_request = "{}/robots.txt".format(domain_name)
-            response = url_req.get(url_request, proxy_address)
+            response = url_req.get(url_request, proxy_address, "", 1)
             data = response.read().decode()
             
             if data is not "" and data is not "notexist":

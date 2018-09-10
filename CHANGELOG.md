@@ -60,3 +60,5 @@ v0.2.5
 - Deleting pywhois library and using upstream instead
 - Recoding for (suck) URLRequest function and repetation
 - Fix wrong domain check
+- Change wappalyzer to cms detector
+- Improvement for stability performance
