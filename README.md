@@ -69,24 +69,9 @@ Please see Belati TODO list here -> https://github.com/aancw/Belati/issues/12
 - git
 - sqlite3
 - exiftool
-- dnsknife
-- dnspython
 
 ```
-pip install --upgrade pip
-sudo apt-get install nmap git sqlite3
-
-git clone https://github.com/smarnach/pyexiftool.git
-cd pyexiftool
-python setup.py install
-
-git clone https://github.com/Gandi/dnsknife.git
-cd dnsknife
-python setup.py install
-
-git clone https://github.com/rthalley/dnspython.git
-cd dnspython
-python setup.py install
+sudo apt-get install nmap git sqlite3 exiftool
 ```
 
 ## Install/Usage
@@ -95,6 +80,7 @@ python setup.py install
 git clone https://github.com/aancw/Belati.git
 cd Belati
 git submodule update --init --recursive --remote
+pip install --upgrade pip
 pip install -r requirements.txt #please use pip with python v2
 sudo su
 python Belati.py --help
