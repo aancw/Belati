@@ -70,7 +70,6 @@ Please see Belati TODO list here -> https://github.com/aancw/Belati/issues/12
 - sqlite3
 - exiftool
 
-
 ## Install/Usage
 
 ```
@@ -190,6 +189,12 @@ For CentOS/Fedora user, please install this:
 
 ```
 yum install gcc gmp gmp-devel python-devel
+```
+
+For Debian/Ubuntu user, please install this:
+
+```
+sudo apt-get install nmap git sqlite3 exiftool
 ```
 
 
