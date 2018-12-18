@@ -55,3 +55,19 @@ class SubdomainEnum(object):
 				pass
 		except:
 			pass
+
+	def scan_findsubdomainsCom(self,domain_name,proxy_address):
+		try:
+			url = "https://findsubdomains.com/subdomains-of/{}".format(domain_name)
+			data = url_req.standart_request(url, proxy_address)
+			soup = BeautifulSoup( data, 'lxml')
+			subdomain_list = []
+			try:
+				tmp = soup.findAll("a",attrs={"href" : "javascript:void(0);","class" : "desktop-hidden"})
+				for raw in tmp:
+					subdomain_list.append(raw.text)
+				return list(set(subdomain_list))
+			except:
+				pass
+		except:
+			pass

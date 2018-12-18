@@ -324,10 +324,17 @@ class Belati(Cmd):
 
         log.console_log("{}[+] Grabbing data from crt.sh...{}\n".format(B, W))
         crt_list = sub_enum.scan_crtsh(domain_name, proxy)
-
+        
         if crt_list is not None:
             log.console_log("\n".join(crt_list))
             subdomain_list = list(set(subdomain_list + crt_list))
+        
+        log.console_log("{}[+] Grabbing data from findsubdomains.com...{}\n".format(B, W))
+        findsubdomains_list = sub_enum.scan_findsubdomainsCom(domain_name,proxy)
+        
+        if findsubdomains_list is not None:
+            log.console_log("\n".join(findsubdomains_list))
+            subdomain_list = list(set(subdomain_list + findsubdomains_list))
 
         subdomain_ip_list = []
 
