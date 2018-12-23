@@ -371,7 +371,7 @@ class Belati(Cmd):
         except urllib2.HTTPError as exc:
             log.console_log('HTTP Error: {0}'.format(str(exc)))
         except Exception as exc:
-            log.console_log('Unknow error: {0}'.format(str(exc)))
+            log.console_log('Unknown error: {0}'.format(str(exc)))
 
     def service_scanning(self, ipaddress):
         scan_nm = ScanNmap()
