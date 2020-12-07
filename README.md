@@ -36,7 +36,7 @@ Just for learning stuff and OSINT purpose. Correct me if i'm wrong
 - DNS mapping / Zone Scanning
 - Mail Harvester from Website & Search Engine
 - Mail Harvester from MIT PGP Public Key Server
-- Scrapping Public Document for Domain from Search Engine
+- Scraping Public Document for Domain from Search Engine
 - Fake and Random User Agent ( Prevent from blocking )
 - Proxy Support for Harvesting Emails and Documents
 - Public Git Finder in domain/subdomain
